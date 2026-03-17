@@ -1,0 +1,10 @@
+# Core
+Flask==2.0.1
+python-dotenv==0.19.0
+requests==2.25.1
+
+# Intentionally older packages — good targets for Black Duck Code Sight SCA findings
+Jinja2==3.0.1
+Werkzeug==2.0.1
+urllib3==1.26.5
+certifi==2021.5.30

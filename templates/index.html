@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NASA Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0d12;
+      --surface:   #13161f;
+      --border:    #1e2330;
+      --text:      #e2e5ef;
+      --muted:     #6b7280;
+      --accent:    #4f8ef7;
+      --accent2:   #f7974f;
+      --danger:    #ef4f6b;
+      --green:     #4fef9a;
+      --radius:    10px;
+      --font-mono: 'DM Mono', monospace;
+      --font-sans: 'DM Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    header h1 {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    header .timestamp {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    nav {
+      display: flex;
+      gap: 4px;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav button {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    nav button:hover { color: var(--text); border-color: var(--border); }
+
+    nav button.active {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    main { padding: 32px; max-width: 1200px; }
+
+    /* ── Panel / Card ── */
+    .panel {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+    .panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .panel-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .panel-header .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Loading / Error ── */
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 40px 0;
+    }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      padding: 16px;
+      background: rgba(239, 79, 107, 0.06);
+      border: 1px solid rgba(239, 79, 107, 0.2);
+      border-radius: var(--radius);
+    }
+
+    /* ── APOD ── */
+    .apod-image {
+      width: 100%;
+      max-height: 520px;
+      object-fit: cover;
+      border-radius: calc(var(--radius) - 2px);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .apod-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .apod-meta {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .apod-explanation {
+      font-size: 14px;
+      line-height: 1.75;
+      color: #9ba3b8;
+    }
+
+    .apod-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .apod-controls input[type="date"] {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      outline: none;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 18px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+
+    /* ── Mars Grid ── */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .photo-item {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 1;
+      background: var(--border);
+    }
+
+    .photo-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s;
+    }
+
+    .photo-item:hover img { transform: scale(1.04); }
+
+    .photo-item .photo-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 6px 10px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: #ccc;
+    }
+
+    .mars-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .mars-controls label { font-size: 13px; color: var(--muted); }
+
+    .mars-controls input[type="number"] {
+      width: 100px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      outline: none;
+    }
+
+    /* ── NEO Table ── */
+    .neo-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 18px;
+    }
+
+    .stat-chip .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-chip .value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+
+    .neo-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .neo-table th {
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 0 12px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .neo-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .neo-table tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .badge.hazardous   { background: rgba(239, 79, 107, 0.15); color: var(--danger); }
+    .badge.safe        { background: rgba(79, 239, 154, 0.12); color: var(--green); }
+
+    /* ── ISS ── */
+    .iss-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) { .iss-grid { grid-template-columns: 1fr; } }
+
+    .iss-coords {
+      font-family: var(--font-mono);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--accent);
+      margin: 8px 0 4px;
+    }
+
+    .iss-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+
+    .crew-list { list-style: none; }
+
+    .crew-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .crew-list li:last-child { border-bottom: none; }
+
+    .crew-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .iss-refresh {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .map-placeholder {
+      width: 100%;
+      height: 220px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 39px,
+        var(--border) 39px,
+        var(--border) 40px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 39px,
+        var(--border) 39px,
+        var(--border) 40px
+      );
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .iss-dot {
+      position: absolute;
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent);
+      transform: translate(-50%, -50%);
+      transition: left 1s ease, top 1s ease;
+    }
+
+    .map-label {
+      position: absolute;
+      bottom: 8px; left: 10px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="dot"></div>
+    <h1>NASA Space Dashboard</h1>
+    <span class="timestamp" id="clock"></span>
+  </header>
+
+  <nav>
+    <button class="active" onclick="switchPanel('apod', this)">🔭 Picture of the Day</button>
+    <button onclick="switchPanel('mars', this)">🔴 Mars Rover</button>
+    <button onclick="switchPanel('neo', this)">☄️ Near Earth Objects</button>
+    <button onclick="switchPanel('iss', this)">🛰 ISS Location</button>
+  </nav>
+
+  <main>
+
+    <!-- APOD -->
+    <div id="panel-apod" class="panel active">
+      <div class="panel-header">
+        <h2>Astronomy Picture of the Day</h2>
+        <span class="subtitle">NASA APOD API</span>
+      </div>
+      <div class="apod-controls">
+        <input type="date" id="apod-date" />
+        <button class="btn" onclick="loadApod()">Load</button>
+      </div>
+      <div id="apod-content"><div class="loading"><div class="spinner"></div> Fetching today's image…</div></div>
+    </div>
+
+    <!-- Mars -->
+    <div id="panel-mars" class="panel">
+      <div class="panel-header">
+        <h2>Mars Rover Photos</h2>
+        <span class="subtitle">Curiosity · NASA Mars Photos API</span>
+      </div>
+      <div class="mars-controls">
+        <label>Sol (Martian day):</label>
+        <input type="number" id="mars-sol" value="1000" min="1" max="4000" />
+        <button class="btn" onclick="loadMars()">Load</button>
+      </div>
+      <div id="mars-content"><div class="loading"><div class="spinner"></div> Loading Mars photos…</div></div>
+    </div>
+
+    <!-- NEO -->
+    <div id="panel-neo" class="panel">
+      <div class="panel-header">
+        <h2>Near Earth Objects</h2>
+        <span class="subtitle">Today's asteroid approaches · NASA NeoWs API</span>
+      </div>
+      <div id="neo-content"><div class="loading"><div class="spinner"></div> Scanning for asteroids…</div></div>
+    </div>
+
+    <!-- ISS -->
+    <div id="panel-iss" class="panel">
+      <div class="panel-header">
+        <h2>ISS Live Location</h2>
+        <span class="subtitle">Open Notify API · updates every 5s</span>
+      </div>
+      <div id="iss-content"><div class="loading"><div class="spinner"></div> Locating the station…</div></div>
+    </div>
+
+  </main>
+
+  <script>
+    // ── Clock ──
+    function updateClock() {
+      document.getElementById("clock").textContent =
+        new Date().toUTCString().replace("GMT", "UTC");
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ── Panel switching ──
+    let issInterval = null;
+
+    function switchPanel(id, btn) {
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+      document.getElementById("panel-" + id).classList.add("active");
+      btn.classList.add("active");
+
+      if (issInterval) { clearInterval(issInterval); issInterval = null; }
+
+      if (id === "apod")  loadApod();
+      if (id === "mars")  loadMars();
+      if (id === "neo")   loadNeo();
+      if (id === "iss")   { loadIss(); issInterval = setInterval(loadIss, 5000); }
+    }
+
+    // ── Helpers ──
+    function setContent(id, html) {
+      document.getElementById(id).innerHTML = html;
+    }
+
+    function errorHTML(msg) {
+      return `<div class="error-msg">⚠ ${msg}</div>`;
+    }
+
+    // ── APOD ──
+    async function loadApod() {
+      const dateEl = document.getElementById("apod-date");
+      if (!dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
+      setContent("apod-content", `<div class="loading"><div class="spinner"></div> Fetching image…</div>`);
+
+      const res = await fetch(`/api/apod?date=${dateEl.value}`);
+      const data = await res.json();
+
+      if (data.error) { setContent("apod-content", errorHTML(data.error)); return; }
+
+      const media = data.media_type === "video"
+        ? `<iframe src="${data.url}" class="apod-image" style="height:400px;border:none;" allowfullscreen></iframe>`
+        : `<img class="apod-image" src="${data.hdurl || data.url}" alt="${data.title}" loading="lazy" />`;
+
+      setContent("apod-content", `
+        <div class="card">
+          ${media}
+          <div class="apod-title">${data.title}</div>
+          <div class="apod-meta">${data.date}${data.copyright ? " · © " + data.copyright : ""}</div>
+          <div class="apod-explanation">${data.explanation}</div>
+        </div>
+      `);
+    }
+
+    // ── Mars ──
+    async function loadMars() {
+      const sol = document.getElementById("mars-sol").value;
+      setContent("mars-content", `<div class="loading"><div class="spinner"></div> Loading sol ${sol}…</div>`);
+
+      const res = await fetch(`/api/mars?sol=${sol}`);
+      const data = await res.json();
+
+      if (data.error) { setContent("mars-content", errorHTML(data.error)); return; }
+      if (!data.photos || data.photos.length === 0) {
+        setContent("mars-content", errorHTML(`No photos found for sol ${sol}. Try another Martian day.`));
+        return;
+      }
+
+      const grid = data.photos.map(p => `
+        <div class="photo-item">
+          <img src="${p.img_src}" alt="${p.camera.full_name}" loading="lazy" />
+          <div class="photo-label">${p.camera.name}</div>
+        </div>
+      `).join("");
+
+      setContent("mars-content", `
+        <div class="card" style="padding:12px">
+          <div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-bottom:12px">
+            ${data.total} photos taken · showing first ${data.photos.length}
+          </div>
+          <div class="photo-grid">${grid}</div>
+        </div>
+      `);
+    }
+
+    // ── NEO ──
+    async function loadNeo() {
+      setContent("neo-content", `<div class="loading"><div class="spinner"></div> Scanning for asteroids…</div>`);
+      const res = await fetch("/api/neo");
+      const data = await res.json();
+
+      if (data.error) { setContent("neo-content", errorHTML(data.error)); return; }
+
+      const hazardous = data.objects.filter(o => o.is_potentially_hazardous_asteroid).length;
+
+      const rows = data.objects.map(o => {
+        const approach = o.close_approach_data[0];
+        const distKm   = parseFloat(approach.miss_distance.kilometers).toLocaleString("en-US", {maximumFractionDigits: 0});
+        const speed    = parseFloat(approach.relative_velocity.kilometers_per_hour).toLocaleString("en-US", {maximumFractionDigits: 0});
+        const diam     = ((o.estimated_diameter.kilometers.estimated_diameter_min + o.estimated_diameter.kilometers.estimated_diameter_max) / 2).toFixed(2);
+        const badge    = o.is_potentially_hazardous_asteroid
+          ? `<span class="badge hazardous">Hazardous</span>`
+          : `<span class="badge safe">Safe</span>`;
+        return `
+          <tr>
+            <td>${o.name.replace("(", "").replace(")", "")}</td>
+            <td>${diam} km</td>
+            <td style="font-family:var(--font-mono)">${distKm} km</td>
+            <td style="font-family:var(--font-mono)">${speed} km/h</td>
+            <td>${badge}</td>
+          </tr>`;
+      }).join("");
+
+      setContent("neo-content", `
+        <div class="neo-stats">
+          <div class="stat-chip">
+            <div class="label">Total Today</div>
+            <div class="value">${data.count}</div>
+          </div>
+          <div class="stat-chip">
+            <div class="label">Potentially Hazardous</div>
+            <div class="value" style="color:var(--danger)">${hazardous}</div>
+          </div>
+          <div class="stat-chip">
+            <div class="label">Date</div>
+            <div class="value" style="font-size:16px;font-family:var(--font-mono)">${data.date}</div>
+          </div>
+        </div>
+        <div class="card" style="padding:0 24px">
+          <table class="neo-table">
+            <thead>
+              <tr>
+                <th>Name</th><th>Est. Diameter</th><th>Miss Distance</th><th>Speed</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `);
+    }
+
+    // ── ISS ──
+    let issFirstLoad = true;
+
+    async function loadIss() {
+      const res = await fetch("/api/iss");
+      const data = await res.json();
+
+      if (data.error) { setContent("iss-content", errorHTML(data.error)); return; }
+
+      const lat = parseFloat(data.iss_position.latitude).toFixed(4);
+      const lon = parseFloat(data.iss_position.longitude).toFixed(4);
+
+      // Map: convert lat/lon to % position on simple world grid
+      const mapX = ((parseFloat(lon) + 180) / 360 * 100).toFixed(1);
+      const mapY = ((90 - parseFloat(lat)) / 180 * 100).toFixed(1);
+
+      const crewItems = data.crew.map(p => `
+        <li>
+          <div class="crew-avatar">${p.name.split(" ").map(n => n[0]).join("").slice(0,2)}</div>
+          ${p.name} <span style="color:var(--muted);font-size:12px;margin-left:auto">${p.craft}</span>
+        </li>
+      `).join("");
+
+      setContent("iss-content", `
+        <div class="map-placeholder">
+          <div class="iss-dot" style="left:${mapX}%;top:${mapY}%"></div>
+          <div class="map-label">Approximate ISS ground track</div>
+        </div>
+        <div class="iss-grid">
+          <div class="card">
+            <div class="iss-label">Latitude</div>
+            <div class="iss-coords">${lat}°</div>
+            <div class="iss-label">Longitude</div>
+            <div class="iss-coords">${lon}°</div>
+            <div class="iss-refresh">Updated at ${new Date().toLocaleTimeString()}</div>
+          </div>
+          <div class="card">
+            <div class="iss-label" style="margin-bottom:12px">Crew Aboard (${data.crew.length})</div>
+            <ul class="crew-list">${crewItems || "<li style='color:var(--muted)'>No crew data</li>"}</ul>
+          </div>
+        </div>
+      `);
+
+      issFirstLoad = false;
+    }
+
+    // ── Init: set today's date and load APOD ──
+    document.getElementById("apod-date").value = new Date().toISOString().slice(0, 10);
+    loadApod();
+  </script>
+</body>
+</html>

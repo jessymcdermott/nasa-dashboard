@@ -1,0 +1,52 @@
+# 🛰 NASA Space Dashboard
+
+A Flask web app pulling live data from 4 NASA APIs — built as a Black Duck Code Sight test project.
+
+## APIs Used
+
+| Panel | API | Endpoint |
+|---|---|---|
+| Picture of the Day | NASA APOD | `api.nasa.gov/planetary/apod` |
+| Mars Rover Photos | NASA Mars Photos | `api.nasa.gov/mars-photos/api/v1/...` |
+| Near Earth Objects | NASA NeoWs | `api.nasa.gov/neo/rest/v1/feed` |
+| ISS Location | Open Notify | `api.open-notify.org/iss-now.json` |
+
+## Setup
+
+**1. Clone / open in VS Code**
+
+**2. Create a virtual environment**
+```bash
+python -m venv venv
+source venv/bin/activate        # Mac/Linux
+venv\Scripts\activate           # Windows
+```
+
+**3. Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+**4. Set your NASA API key**
+```bash
+cp .env.example .env
+# Edit .env and replace DEMO_KEY with your key from https://api.nasa.gov/
+```
+> Without a key it still works — DEMO_KEY is rate-limited to 30 req/hour.
+
+**5. Run**
+```bash
+python app.py
+```
+
+Open [http://localhost:5000](http://localhost:5000)
+
+---
+
+## For Black Duck Code Sight Testing
+
+This project is intentionally structured to exercise both SAST and SCA scanning:
+
+- **SCA targets**: `requirements.txt` uses older pinned versions of Flask, Werkzeug, urllib3, Jinja2, and certifi — these should surface known CVEs
+- **SAST surface**: HTTP calls with user-supplied query params passed to external APIs, no input sanitization
+- **Dependencies to watch**: `requests==2.25.1`, `urllib3==1.26.5`
