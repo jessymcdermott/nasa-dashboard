@@ -1,0 +1,2 @@
+/Users/jmcdermott/bridge-cli/adapters/srm-initializer/versions/0.0.96/srm-initializer /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/srm_initializer/data.json
+{"level":"error","logger":"SRM Initializer","msg":"Error while fetching project id: Post \"https://placeholder.srm.blackduck.com/srm/api/projects/query\": dial tcp: lookup placeholder.srm.blackduck.com: no such host","time":"2026-03-17 12:06:51.2187 EDT"}

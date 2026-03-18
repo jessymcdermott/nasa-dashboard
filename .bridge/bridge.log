@@ -1,0 +1,24 @@
+2026-03-17 12:06:51.0384 EDT [Bridge CLI] INFO: Using cache directory: /Users/jmcdermott/bridge-cli
+2026-03-17 12:06:51.0440 EDT [Bridge CLI] INFO: Found version "3.0.119" in registry for workflow "srm", trying to load it from local cache
+2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: Input Resources:
+2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: resource = value [source]
+2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: ------------------------------------------------------------
+2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: project.directory = /Users/jmcdermott/Desktop/nasa-dashboard [cmd]
+2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: srm.apiKey = ***************************************** [cmd]
+2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: srm.project.name = nasa-dashboard [cmd]
+2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: srm.url = https://placeholder.srm.blackduck.com [cmd]
+2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: ------------------------------------------------------------
+2026-03-17 12:06:51.1552 EDT [Bridge CLI] INFO: Starting adapters for stage srm
+2026-03-17 12:06:51.1553 EDT [Bridge CLI] INFO: Starting Adapter: SRM Controller
+2026-03-17 12:06:51.1553 EDT [Bridge CLI] INFO: Starting Adapter: SRM Initializer
+2026-03-17 12:06:51.1615 EDT [Bridge CLI] INFO: Starting Adapter: Default Bridge Invoked From
+2026-03-17 12:06:51.1616 EDT [Default Bridge Invoked From] INFO: Provided value for resource 'bridge.invoked.from'
+2026-03-17 12:06:51.1616 EDT [Default Bridge Invoked From] INFO: Adapter finished
+2026-03-17 12:06:51.2187 EDT [SRM Initializer] ERROR: Error while fetching project id: Post "https://placeholder.srm.blackduck.com/srm/api/projects/query": dial tcp: lookup placeholder.srm.blackduck.com: no such host
+2026-03-17 12:06:51.2234 EDT [SRM Initializer] ERROR: Adapter failed: exit status 1
+2026-03-17 12:06:51.2240 EDT [Bridge CLI] INFO: Starting Adapter: Set SRM Wait For Scan
+2026-03-17 12:06:51.2241 EDT [Set SRM Wait For Scan] INFO: Provided value for resource 'srm.waitForScan'
+2026-03-17 12:06:51.2241 EDT [Set SRM Wait For Scan] INFO: Adapter finished
+2026-03-17 12:06:51.2522 EDT [SRM Controller] ERROR: Initialization step failed - stopping workflow.
+2026-03-17 12:06:51.2568 EDT [SRM Controller] ERROR: Adapter failed: exit status 1
+

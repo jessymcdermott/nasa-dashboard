@@ -1,0 +1,2 @@
+/Users/jmcdermott/bridge-cli/adapters/polaris-initializer/versions/1.0.241/polaris-initializer /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_initializer/data.json
+{"level":"error","logger":"Polaris Initializer","msg":"Invalid access token \"placeholder\": invalid length","time":"2026-03-17 11:50:17.4227 EDT"}
