@@ -1,4 +1,3 @@
-cat > ~/Desktop/nasa-dashboard/.github/workflows/blackduck.yml << 'EOF'
 name: Black Duck Security Scan
 
 on:
