@@ -1,0 +1,53 @@
+cat > ~/Desktop/nasa-dashboard/.github/workflows/blackduck.yml << 'EOF'
+name: Black Duck Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Download Bridge CLI
+        run: |
+          curl -fLsS -o bridge.zip https://repo.blackduck.com/bds-integrations-release/com/blackduck/integration/bridge/binaries/bridge-cli-bundle/latest/bridge-cli-bundle-linux64.zip
+          unzip -q bridge.zip -d $HOME/bridge-cli
+          chmod +x $HOME/bridge-cli/bridge-cli
+
+      - name: Run Black Duck SCA Scan
+        env:
+          BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
+          BLACKDUCK_TOKEN: ${{ secrets.BLACKDUCK_TOKEN }}
+        run: |
+          $HOME/bridge-cli/bridge-cli --stage blackducksca \
+            blackducksca.url="$BLACKDUCK_URL" \
+            blackducksca.token="$BLACKDUCK_TOKEN" \
+            project.directory="$GITHUB_WORKSPACE"
+
+      - name: Run Polaris SAST Scan
+        env:
+          POLARIS_URL: ${{ secrets.POLARIS_URL }}
+          POLARIS_TOKEN: ${{ secrets.POLARIS_TOKEN }}
+        run: |
+          $HOME/brid
