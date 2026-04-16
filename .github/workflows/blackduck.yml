@@ -1,4 +1,3 @@
-cat << 'EOF' > .github/workflows/blackduck.yml
 name: Black Duck Security Scan
 
 on:
@@ -38,4 +37,4 @@ jobs:
             blackducksca.url="$BLACKDUCK_URL" \
             blackducksca.token="$BLACKDUCK_TOKEN" \
             project.directory="$GITHUB_WORKSPACE"
-EOF
+
