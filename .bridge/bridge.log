@@ -320,3 +320,32 @@
 2026-04-16 10:13:55.4615 EDT [Polaris Waiter] INFO: Polling Test Manager: state of test with assessment type "SAST(sastFull)" and id "f6968156-9869-4614-a40d-e913ee128e4d" is "Waiting for Capture"
 2026-04-16 10:14:05.7097 EDT [Polaris Waiter] INFO: Polling Test Manager: state of test with assessment type "SAST(sastFull)" and id "f6968156-9869-4614-a40d-e913ee128e4d" is "Queuing"
 2026-04-16 10:14:15.9026 EDT [Polaris Waiter] INFO: Polling Test Manager: state of test with assessment type "SAST(sastFull)" and id "f6968156-9869-4614-a40d-e913ee128e4d" is "Scanning"
+2026-04-16 10:47:04.0369 EDT [Polaris Waiter] INFO: test with assessment type "SAST(sastFull)" and id "f6968156-9869-4614-a40d-e913ee128e4d" completed successfully
+2026-04-16 10:47:04.0661 EDT [Polaris Waiter] INFO: Provided value for resource 'polaris.test.sca.tests.scaPackage.completed'
+2026-04-16 10:47:04.0663 EDT [Polaris Waiter] INFO: Provided value for resource 'polaris.test.sast.tests.sastFull.completed'
+2026-04-16 10:47:04.0669 EDT [Polaris Waiter] ERROR: Adapter failed: exit status 1
+2026-04-16 10:47:04.5621 EDT [Polaris Issues Fetcher] INFO: Fetching issues for "SAST(sastFull)" assessment
+2026-04-16 10:47:04.5623 EDT [Polaris Issues Fetcher] WARNING: Will not fetch issues for "SCA(scaPackage)" assessment, as the test is not completed
+2026-04-16 10:47:05.0963 EDT [Polaris Issues Fetcher] INFO: Successfully fetched issues for assessment type "SAST(sastFull)" with id "f6968156-9869-4614-a40d-e913ee128e4d"
+ {
+ "critical": 0,
+ "high": 1,
+ "informational": 0,
+ "low": 2,
+ "medium": 14
+}
+2026-04-16 10:47:05.1211 EDT [Polaris Issues Fetcher] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.issues.low'
+2026-04-16 10:47:05.1213 EDT [Polaris Issues Fetcher] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.issues.medium'
+2026-04-16 10:47:05.1216 EDT [Polaris Issues Fetcher] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.issues.high'
+2026-04-16 10:47:05.1218 EDT [Polaris Issues Fetcher] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.issues.critical'
+2026-04-16 10:47:05.1220 EDT [Polaris Issues Fetcher] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.issues.informational'
+2026-04-16 10:47:05.1222 EDT [Polaris Issues Fetcher] INFO: Adapter finished
+2026-04-16 10:47:05.6122 EDT [Polaris Policy Checker] INFO: Checking for policy violations for "SAST(sastFull)" assessment...
+2026-04-16 10:47:05.6125 EDT [Polaris Policy Checker] WARNING: Skipping policy violations check for "SCA(scaPackage)" assessment with id "463186fb-10a4-4738-9cf7-60fbb3ab243d", as the test is not completed
+2026-04-16 10:47:05.9263 EDT [Polaris Policy Checker] INFO: no policies were violated to break the build
+2026-04-16 10:47:05.9540 EDT [Polaris Policy Checker] INFO: Adapter finished
+2026-04-16 10:47:06.3865 EDT [Polaris Status Provider] INFO: Results for test "SAST(sastFull)" with ID "f6968156-9869-4614-a40d-e913ee128e4d" are available at https://polaris.blackduck.com/portfolio/portfolios/78c38705-a639-4f46-bc04-36c0fb762207/portfolio-items/98e86a8e-bd4b-4163-a6f8-f8529f54b096/projects/374353a3-507b-4037-b3b5-f7cce77c3885/tests/f6968156-9869-4614-a40d-e913ee128e4d/detected-issues
+2026-04-16 10:47:06.3865 EDT [Polaris Status Provider] INFO: Polaris issues view for project "Webgoat SCM", branch "CodeSight_jmcdermott+plpm@blackduck.com" is available at https://polaris.blackduck.com/portfolio/portfolios/78c38705-a639-4f46-bc04-36c0fb762207/portfolio-items/98e86a8e-bd4b-4163-a6f8-f8529f54b096/projects/374353a3-507b-4037-b3b5-f7cce77c3885/issues?branchId=118c5a01-cc53-42fa-9c47-e19ef781f224
+2026-04-16 10:47:06.4035 EDT [Polaris Status Provider] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.summary.url'
+2026-04-16 10:47:06.4037 EDT [Polaris Status Provider] INFO: Provided value for resource 'polaris.project.issues.url'
+2026-04-16 10:47:06.4038 EDT [Polaris Status Provider] INFO: Adapter finished

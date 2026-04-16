@@ -34,7 +34,9 @@ jobs:
         run: |
           curl -fLsS -o bridge.zip https://repo.blackduck.com/bds-integrations-release/com/blackduck/integration/bridge/binaries/bridge-cli-bundle/latest/bridge-cli-bundle-linux64.zip
           unzip -q bridge.zip -d $HOME/bridge-cli
-          chmod +x $bridge-cli
+          BRIDGE_BIN=$(find $HOME/bridge-cli -name "bridge-cli" -type f | head -1)
+          chmod +x $BRIDGE_BIN
+          echo "BRIDGE_CLI=$BRIDGE_BIN" >> $GITHUB_ENV
 
       - name: Run Black Duck SCA Scan
         env:
