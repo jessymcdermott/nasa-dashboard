@@ -1,11 +1,11 @@
-cat << 'EOF' > ~/Desktop/asa-dashboard/.github/workflows/blackduck.yml
+cat << 'EOF' > .github/workflows/blackduck.yml
 name: Black Duck Security Scan
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -15,21 +15,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '21'
 
       - name: Download Bridge CLI
+        run: |
+          curl -fLsS -o bridge.zip https://repo.blackduck.com/bds-integrations-release/com/blackduck/integration/bridge/binaries/bridge-cli-bundle/latest/bridge-cli-bundle-linux64.zip
+          unzip -q bridge.zip -d $HOME/bridge-cli
+          BRIDGE_BIN=$(find $HOME/bridge-cli -name "bridge-cli" -type f | head -1)
+          chmod +x "$BRIDGE_BIN"
+          echo "BRIDGE_CLI=$BRIDGE_BIN" >> $GITHUB_ENV
+
+      - name: Run Black Duck SCA Scan
+        env:
+          BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
+          BLACKDUCK_TOKEN: ${{ secrets.BLACKDUCK_TOKEN }}
+        run: |
+          "$BRIDGE_CLI" --stage blackducksca \
+            blackducksca.url="$BLACKDUCK_URL" \
+            blackducksca.token="$BLACKDUCK_TOKEN" \
+            project.directory="$GITHUB_WORKSPACE"
+EOF
