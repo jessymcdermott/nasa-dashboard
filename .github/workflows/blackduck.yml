@@ -1,4 +1,4 @@
-cat < ~/Desktop/asa-dashboard/.github/workflows/blackduck.yml << 'EOF'
+cat << 'EOF' > ~/Desktop/asa-dashboard/.github/workflows/blackduck.yml 
 
 name: Black Duck Security Scan
 
