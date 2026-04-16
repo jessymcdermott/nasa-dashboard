@@ -1,24 +1,322 @@
-2026-03-17 12:06:51.0384 EDT [Bridge CLI] INFO: Using cache directory: /Users/jmcdermott/bridge-cli
-2026-03-17 12:06:51.0440 EDT [Bridge CLI] INFO: Found version "3.0.119" in registry for workflow "srm", trying to load it from local cache
-2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: Input Resources:
-2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: resource = value [source]
-2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: ------------------------------------------------------------
-2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: project.directory = /Users/jmcdermott/Desktop/nasa-dashboard [cmd]
-2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: srm.apiKey = ***************************************** [cmd]
-2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: srm.project.name = nasa-dashboard [cmd]
-2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: srm.url = https://placeholder.srm.blackduck.com [cmd]
-2026-03-17 12:06:51.1551 EDT [Bridge CLI] INFO: ------------------------------------------------------------
-2026-03-17 12:06:51.1552 EDT [Bridge CLI] INFO: Starting adapters for stage srm
-2026-03-17 12:06:51.1553 EDT [Bridge CLI] INFO: Starting Adapter: SRM Controller
-2026-03-17 12:06:51.1553 EDT [Bridge CLI] INFO: Starting Adapter: SRM Initializer
-2026-03-17 12:06:51.1615 EDT [Bridge CLI] INFO: Starting Adapter: Default Bridge Invoked From
-2026-03-17 12:06:51.1616 EDT [Default Bridge Invoked From] INFO: Provided value for resource 'bridge.invoked.from'
-2026-03-17 12:06:51.1616 EDT [Default Bridge Invoked From] INFO: Adapter finished
-2026-03-17 12:06:51.2187 EDT [SRM Initializer] ERROR: Error while fetching project id: Post "https://placeholder.srm.blackduck.com/srm/api/projects/query": dial tcp: lookup placeholder.srm.blackduck.com: no such host
-2026-03-17 12:06:51.2234 EDT [SRM Initializer] ERROR: Adapter failed: exit status 1
-2026-03-17 12:06:51.2240 EDT [Bridge CLI] INFO: Starting Adapter: Set SRM Wait For Scan
-2026-03-17 12:06:51.2241 EDT [Set SRM Wait For Scan] INFO: Provided value for resource 'srm.waitForScan'
-2026-03-17 12:06:51.2241 EDT [Set SRM Wait For Scan] INFO: Adapter finished
-2026-03-17 12:06:51.2522 EDT [SRM Controller] ERROR: Initialization step failed - stopping workflow.
-2026-03-17 12:06:51.2568 EDT [SRM Controller] ERROR: Adapter failed: exit status 1
-
+2026-04-16 10:12:42.0998 EDT [Bridge CLI] INFO: Using cache directory: /Users/jmcdermott/.blackduck/desktop/controller/installedtools/bridge/4.1.2
+2026-04-16 10:12:42.1046 EDT [Bridge CLI] INFO: Found version "3.0.524" in registry for workflow "polaris", trying to load it from local cache
+2026-04-16 10:12:42.3632 EDT [Bridge CLI] INFO: Input Resources:
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: resource = value [source]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: ------------------------------------------------------------
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: POLARIS.ACCESSTOKEN = ***************************************** [env]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: POLARIS.application.name = WebGoat [cmd]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: POLARIS.assessment.mode = IDE [cmd]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: POLARIS.assessment.types = [SAST SCA] [cmd]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: POLARIS.branch.name = CodeSight_jmcdermott+plpm@blackduck.com [cmd]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: POLARIS.onboarding = true [cmd]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: POLARIS.project.name = Webgoat SCM [cmd]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: POLARIS.serverurl = https://polaris.blackduck.com [cmd]
+2026-04-16 10:12:42.3633 EDT [Bridge CLI] INFO: ------------------------------------------------------------
+2026-04-16 10:12:42.3634 EDT [Bridge CLI] INFO: Starting adapters for stage polaris
+2026-04-16 10:12:42.3634 EDT [Bridge CLI] INFO: Starting Adapter: Polaris Initializer
+2026-04-16 10:12:42.3634 EDT [Bridge CLI] INFO: Starting Adapter: Polaris SCM Discovery
+2026-04-16 10:12:42.8752 EDT [Polaris SCM Discovery] INFO: Adapter finished
+2026-04-16 10:12:43.8865 EDT [Polaris Initializer] INFO: Branch doesn't exist. Will create new branch as 'polaris.onboarding' is set to 'true'
+2026-04-16 10:12:44.6193 EDT [Polaris Initializer] INFO: No version specified for cov_thin_client, using recommended version: 2025.12.0
+2026-04-16 10:12:44.9322 EDT [Polaris Initializer] INFO: No version specified for detect, using recommended version: 10.4.0
+2026-04-16 10:12:45.8123 EDT [Polaris Initializer] INFO: Successfully created test for "SCA(scaPackage)" assessment. The short test ID is "1XPC0MX"
+2026-04-16 10:12:45.8123 EDT [Polaris Initializer] INFO: Successfully created test for "SAST(sastFull)" assessment. The short test ID is "DWSBG44"
+2026-04-16 10:12:45.8363 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.id'
+2026-04-16 10:12:45.8365 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.test.SCA.tests.scaPackage.id'
+2026-04-16 10:12:45.8367 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.shortId'
+2026-04-16 10:12:45.8369 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.test.SCA.tests.scaPackage.shortId'
+2026-04-16 10:12:45.8370 EDT [Polaris Initializer] INFO: Added entry to resource 'polaris.test.SAST.tests.sastFull.toolIds'
+2026-04-16 10:12:45.8375 EDT [Polaris Initializer] INFO: Added entry to resource 'polaris.test.SCA.tests.scaPackage.toolIds'
+2026-04-16 10:12:45.8378 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.streamId'
+2026-04-16 10:12:45.8380 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.test.SAST.tests.sastFull.requested'
+2026-04-16 10:12:45.8382 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.test.SCA.tests.scaPackage.requested'
+2026-04-16 10:12:45.8384 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.project.id'
+2026-04-16 10:12:45.8385 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.branch.id'
+2026-04-16 10:12:45.8387 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.portfolioid'
+2026-04-16 10:12:45.8388 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.tenant.id'
+2026-04-16 10:12:45.8390 EDT [Polaris Initializer] INFO: Provided value for resource 'polaris.application.id'
+2026-04-16 10:12:45.8390 EDT [Bridge CLI] INFO: Starting adapters for stage polaris-controller
+2026-04-16 10:12:45.8391 EDT [Bridge CLI] INFO: Starting Adapter: Polaris Controller
+2026-04-16 10:12:45.8393 EDT [Polaris Initializer] INFO: Adapter finished
+2026-04-16 10:12:45.8531 EDT [Bridge CLI] INFO: Starting Adapter: Set Polaris Wait For Scan
+2026-04-16 10:12:45.8533 EDT [Set Polaris Wait For Scan] INFO: Provided value for resource 'polaris.waitForScan'
+2026-04-16 10:12:45.8533 EDT [Set Polaris Wait For Scan] INFO: Adapter finished
+2026-04-16 10:12:45.8552 EDT [Bridge CLI] INFO: Starting Adapter: Check pull request
+2026-04-16 10:12:46.2973 EDT [Check pull request] INFO: Provided value for resource 'environment.scan.pull'
+2026-04-16 10:12:46.2975 EDT [Check pull request] INFO: Adapter finished
+2026-04-16 10:12:46.7710 EDT [Polaris Controller] INFO: Running for "sast" assessment with scan type "sastFull"
+2026-04-16 10:12:46.7713 EDT [Polaris Controller] INFO: checking "coverity" tool installation inside bridge home directory: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0
+2026-04-16 10:12:46.7713 EDT [Polaris Controller] INFO: Checking tool version for "cov_thin_client" in "/Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0"
+2026-04-16 10:12:46.7721 EDT [Polaris Controller] INFO: either "coverity" tool version "2025.12.0" not found or unable to detect existing installation, will schedule new installation
+2026-04-16 10:12:47.0869 EDT [Polaris Controller] INFO: checking "Sigma" tool installation inside bridge home directory: /Users/jmcdermott/.blackduck/bridge/tools/sigma/2026.3.0
+2026-04-16 10:12:47.0869 EDT [Polaris Controller] INFO: Checking tool version for "sigma" in "/Users/jmcdermott/.blackduck/bridge/tools/sigma/2026.3.0"
+2026-04-16 10:12:47.0871 EDT [Polaris Controller] INFO: either "Sigma" tool version "2026.3.0" not found or unable to detect existing installation, will schedule new installation
+2026-04-16 10:12:47.3499 EDT [Polaris Controller] INFO: Running for "sca" assessment with scan type "scaPackage"
+2026-04-16 10:12:47.3499 EDT [Polaris Controller] INFO: checking "detect" tool installation inside bridge home directory: /Users/jmcdermott/.blackduck/bridge/tools/blackduck-detect/10.4.0
+2026-04-16 10:12:47.3514 EDT [Polaris Controller] INFO: Running command:/usr/bin/java -version
+2026-04-16 10:12:47.4937 EDT [Polaris Controller] INFO: Checking tool version for "detect" in "/Users/jmcdermott/.blackduck/bridge/tools/blackduck-detect/10.4.0"
+2026-04-16 10:12:47.4938 EDT [Polaris Controller] INFO: either "detect" tool version "10.4.0" not found or unable to detect existing installation, will schedule new installation
+2026-04-16 10:12:47.7470 EDT [Polaris Controller] INFO: Provided value for resource 'coverity.id'
+2026-04-16 10:12:47.7471 EDT [Polaris Controller] INFO: Provided value for resource 'sigma.id'
+2026-04-16 10:12:47.7472 EDT [Polaris Controller] INFO: Provided value for resource 'detect.id'
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage coverity-installer
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage sigma-installer
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage polaris-sast
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage detect-installer
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage polaris-sca-package
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage downloader
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage polaris-artifacts-uploader
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage polaris-post-processing
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting adapters for stage polaris-status
+2026-04-16 10:12:47.7474 EDT [Bridge CLI] INFO: Starting Adapter: Polaris Waiter
+2026-04-16 10:12:47.7474 EDT [Bridge CLI] INFO: Starting Adapter: Polaris Issues Fetcher
+2026-04-16 10:12:47.7475 EDT [Bridge CLI] INFO: Starting Adapter: Downloader Adapter
+2026-04-16 10:12:47.7475 EDT [Bridge CLI] INFO: Starting Adapter: Polaris Policy Checker
+2026-04-16 10:12:47.7475 EDT [Bridge CLI] INFO: Starting Adapter: Polaris Coverity Capture
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting Adapter: Sigma Installer
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting Adapter: Polaris SCA Package Manager Scan
+2026-04-16 10:12:47.7473 EDT [Bridge CLI] INFO: Starting Adapter: Detect Installer
+2026-04-16 10:12:47.7474 EDT [Bridge CLI] INFO: Starting Adapter: Polaris Status Provider
+2026-04-16 10:12:47.7474 EDT [Bridge CLI] INFO: Starting Adapter: Polaris Artifacts Uploader
+2026-04-16 10:12:47.7474 EDT [Bridge CLI] INFO: Starting Adapter: List Languages
+2026-04-16 10:12:47.7475 EDT [Bridge CLI] INFO: Starting Adapter: Coverity Installer
+2026-04-16 10:12:47.7477 EDT [Polaris Controller] INFO: Adapter finished
+2026-04-16 10:12:47.7869 EDT [Bridge CLI] INFO: Starting Adapter: Default Adapter for download url
+2026-04-16 10:12:47.7869 EDT [Bridge CLI] INFO: Starting Adapter: Default Adapter for download url
+2026-04-16 10:12:47.7871 EDT [Bridge CLI] INFO: Starting Adapter: Default Adapter for project directory
+2026-04-16 10:12:47.7872 EDT [Bridge CLI] INFO: Starting Adapter: Default Adapter for download url
+2026-04-16 10:12:47.7873 EDT [Default Adapter for download url] INFO: Provided value for resource 'downloads.sigma.url'
+2026-04-16 10:12:47.7873 EDT [Default Adapter for download url] INFO: Adapter finished
+2026-04-16 10:12:47.7875 EDT [Default Adapter for download url] INFO: Provided value for resource 'downloads.coverity.url'
+2026-04-16 10:12:47.7875 EDT [Default Adapter for download url] INFO: Adapter finished
+2026-04-16 10:12:47.7877 EDT [Default Adapter for download url] INFO: Provided value for resource 'downloads.detect.url'
+2026-04-16 10:12:47.7877 EDT [Default Adapter for download url] INFO: Adapter finished
+2026-04-16 10:12:47.7879 EDT [Default Adapter for project directory] INFO: Provided value for resource 'project.directory'
+2026-04-16 10:12:47.7879 EDT [Default Adapter for project directory] INFO: Adapter finished
+2026-04-16 10:12:49.0932 EDT [List Languages] INFO: Language analysis results written to: /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/list_languages/languages_report.json
+2026-04-16 10:12:49.0932 EDT [List Languages] INFO: Language Summary: [{Language:Python Percentage:99.36} {Language:HTML Percentage:0.25} {Language:JavaScript Percentage:0.12} {Language:PowerShell Percentage:0.11} {Language:CSS Percentage:0.07} {Language:C Percentage:0.05} {Language:fish Percentage:0.03} {Language:Tcsh Percentage:0.01}]
+2026-04-16 10:12:49.1082 EDT [List Languages] INFO: Added entry to resource 'project.languages.results.summary'
+2026-04-16 10:12:49.1084 EDT [List Languages] INFO: Adapter finished
+2026-04-16 10:12:49.7006 EDT [Downloader Adapter] INFO: Beginning download for detect (72.967MB)
+2026-04-16 10:12:49.8579 EDT [Downloader Adapter] INFO: Beginning download for sigma (116.091MB)
+2026-04-16 10:12:49.9239 EDT [Downloader Adapter] INFO: Beginning download for coverity (304.193MB)
+2026-04-16 10:13:03.7494 EDT [Downloader Adapter] INFO: Download for detect completed.
+2026-04-16 10:13:10.4213 EDT [Downloader Adapter] INFO: Download for sigma completed.
+2026-04-16 10:13:23.0358 EDT [Downloader Adapter] INFO: Download for coverity completed.
+2026-04-16 10:13:23.0523 EDT [Downloader Adapter] INFO: Provided value for resource 'downloads.detect.path'
+2026-04-16 10:13:23.0524 EDT [Downloader Adapter] INFO: Provided value for resource 'downloads.sigma.path'
+2026-04-16 10:13:23.0527 EDT [Downloader Adapter] INFO: Provided value for resource 'downloads.coverity.path'
+2026-04-16 10:13:23.0528 EDT [Downloader Adapter] INFO: Adapter finished
+2026-04-16 10:13:23.0530 EDT [Bridge CLI] INFO: Starting Adapter: Default Adapter for install directory
+2026-04-16 10:13:23.0531 EDT [Default Adapter for install directory] INFO: Provided value for resource 'sigma.install.directory'
+2026-04-16 10:13:23.0531 EDT [Default Adapter for install directory] INFO: Adapter finished
+2026-04-16 10:13:23.0536 EDT [Bridge CLI] INFO: Starting Adapter: Default Adapter for install directory
+2026-04-16 10:13:23.0539 EDT [Default Adapter for install directory] INFO: Provided value for resource 'detect.install.directory'
+2026-04-16 10:13:23.0540 EDT [Default Adapter for install directory] INFO: Adapter finished
+2026-04-16 10:13:23.0545 EDT [Bridge CLI] INFO: Starting Adapter: Default Adapter for install directory
+2026-04-16 10:13:23.0546 EDT [Default Adapter for install directory] INFO: Provided value for resource 'coverity.install.directory'
+2026-04-16 10:13:23.0546 EDT [Default Adapter for install directory] INFO: Adapter finished
+2026-04-16 10:13:23.5417 EDT [Sigma Installer] INFO: Provided value for resource 'sigma.execution.path'
+2026-04-16 10:13:23.5418 EDT [Sigma Installer] INFO: Adapter finished
+2026-04-16 10:13:23.9444 EDT [Detect Installer] INFO: Provided value for resource 'detect.execution.path'
+2026-04-16 10:13:23.9445 EDT [Detect Installer] INFO: Adapter finished
+2026-04-16 10:13:28.1535 EDT [Coverity Installer] INFO: Provided value for resource 'coverity.execution.path'
+2026-04-16 10:13:28.1536 EDT [Coverity Installer] INFO: Adapter finished
+2026-04-16 10:13:29.2361 EDT [Polaris Coverity Capture] INFO: Identified workflow: Polaris
+2026-04-16 10:13:29.2366 EDT [Polaris Coverity Capture] INFO: command: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/coverity capture --project-dir /Users/jmcdermott/Desktop/nasa-dashboard --dir /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir -o analyze.location=connect
+2026-04-16 10:13:29.2878 EDT [Polaris Coverity Capture] INFO: coverity 2025.12.0 covcli-2025.12-push-10
+2026-04-16 10:13:29.2878 EDT [Polaris Coverity Capture] INFO: envvar: COVERITY_CACHE_API_TOKEN_FILE=/var/folders/7r/t77kn3vx51x6qsz3lcy8s7pm0000gp/T/polaris_coverity_cache1850928181/.authKey
+2026-04-16 10:13:29.2879 EDT [Polaris Coverity Capture] INFO: envvar: COVERITY_CACHE_KEY=b8372600-4914-43fa-b308-331b0cce02e1
+2026-04-16 10:13:29.2879 EDT [Polaris Coverity Capture] INFO: envvar: COVERITY_CACHE_URL=https://polaris.blackduck.com/api/cache
+2026-04-16 10:13:29.2879 EDT [Polaris Coverity Capture] INFO: envvar: COVERITY_CLI_CAPTURE_ZIP_ARCHIVE=/Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/idir.zip
+2026-04-16 10:13:29.2879 EDT [Polaris Coverity Capture] INFO: envvar: COVERITY_CLI_POLARIS_CLIENT=true
+2026-04-16 10:13:29.2881 EDT [Polaris Coverity Capture] INFO: Detected that stdout is not connected to a terminal.  Defaulting ticker mode to 'none'.
+2026-04-16 10:13:29.2882 EDT [Polaris Coverity Capture] INFO: If this is not correct, explicitly set the ticker mode to the desired value using the '--ticker-mode' option.
+2026-04-16 10:13:29.2887 EDT [Polaris Coverity Capture] INFO: Executing command: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-manage-emit --dir /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir create
+2026-04-16 10:13:29.8265 EDT [Polaris Coverity Capture] INFO: Using lightweight capture with thin client.
+2026-04-16 10:13:29.8267 EDT [Polaris Coverity Capture] INFO: Executing command: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-internal-manage-cache check
+2026-04-16 10:13:30.6252 EDT [Polaris Coverity Capture] INFO: Caching is enabled.
+2026-04-16 10:13:30.6280 EDT [Polaris Coverity Capture] INFO: Telemetry is enabled
+2026-04-16 10:13:30.6645 EDT [Polaris Coverity Capture] INFO: Executing command: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-manage-emit --dir /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir list-capture-diagnostics
+2026-04-16 10:13:30.6794 EDT [Polaris Coverity Capture] INFO: Executing action no-op: nothing to do for initialization
+2026-04-16 10:13:30.7031 EDT [Polaris Coverity Capture] INFO: Executing action Delete compiler configurations for intermediate directory '/Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir'
+2026-04-16 10:13:30.7033 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/build-compiler-configs/coverity_config.xml --compiler gcc --comptype clangcc --template
+2026-04-16 10:13:31.3909 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/build-compiler-configs/coverity_config.xml --compiler cc --comptype gcc --template
+2026-04-16 10:13:31.5787 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/build-compiler-configs/coverity_config.xml --compiler c++ --comptype g++ --template
+2026-04-16 10:13:31.7761 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/build-compiler-configs/coverity_config.xml --compiler clang --comptype clangcc --template
+2026-04-16 10:13:31.9547 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/build-compiler-configs/coverity_config.xml --compiler java --comptype java --template
+2026-04-16 10:13:32.1371 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/build-compiler-configs/coverity_config.xml --compiler go --comptype go --template
+2026-04-16 10:13:32.3351 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/build-compiler-configs/coverity_config.xml --compiler ccache --comptype prefix --template
+2026-04-16 10:13:32.5370 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/build-compiler-configs/coverity_config.xml --compiler kotlinc --comptype kotlinc --template
+2026-04-16 10:13:32.7333 EDT [Polaris Coverity Capture] WARNING: Template config template-java-config-0 already exists for java and will be reused. 
+2026-04-16 10:13:32.7333 EDT [Polaris Coverity Capture] WARNING: Template config template-apt-config-0 already exists for apt and will be reused. 
+2026-04-16 10:13:32.7333 EDT [Polaris Coverity Capture] WARNING: Template config template-javaw-config-0 already exists for javaw and will be reused. 
+2026-04-16 10:13:32.7383 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/buildless-compiler-configs/coverity_config.xml --dart
+2026-04-16 10:13:32.9330 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/buildless-compiler-configs/coverity_config.xml --javascript
+2026-04-16 10:13:33.1441 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/buildless-compiler-configs/coverity_config.xml --php
+2026-04-16 10:13:33.3437 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/buildless-compiler-configs/coverity_config.xml --python
+2026-04-16 10:13:33.5445 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/buildless-compiler-configs/coverity_config.xml --ruby
+2026-04-16 10:13:33.7463 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/buildless-compiler-configs/coverity_config.xml --scala
+2026-04-16 10:13:33.9434 EDT [Polaris Coverity Capture] INFO: Executing action Configure build compiler: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-configure -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/buildless-compiler-configs/coverity_config.xml --comptype capture-config-files --file-regex $capture-config-files$ --template
+2026-04-16 10:13:33.9590 EDT [Polaris Coverity Capture] WARNING: Configuration already exists for file regex $capture-config-files$
+2026-04-16 10:13:33.9590 EDT [Polaris Coverity Capture] INFO:           and it will not be updated.
+2026-04-16 10:13:33.9908 EDT [Polaris Coverity Capture] INFO: Executing action no-op: no compilers need to be unconfigured
+2026-04-16 10:13:34.0108 EDT [Polaris Coverity Capture] INFO: Executing action no-op: compiler configurations loaded
+2026-04-16 10:13:34.0356 EDT [Polaris Coverity Capture] INFO: Executing action Emit files using buildless capture: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-internal-capture-files --dir /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir -c /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/buildless-compiler-configs/coverity_config.xml --ticker-mode none --append-log --capture-list-file /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir/coverity-cli/capture-file-list-154073069 --record-with-source
+2026-04-16 10:13:34.5538 EDT [Polaris Coverity Capture] INFO: Buildless capture started.
+2026-04-16 10:13:34.5862 EDT [Polaris Coverity Capture] INFO: Emitting 729 Files.
+2026-04-16 10:13:40.8404 EDT [Polaris Coverity Capture] INFO: Buildless capture completed.
+2026-04-16 10:13:40.8442 EDT [Polaris Coverity Capture] INFO: Executing action No unwanted TUs to delete
+2026-04-16 10:13:40.8442 EDT [Polaris Coverity Capture] INFO: Executing action Action cleanup: Unwanted TUs action cleanup
+2026-04-16 10:13:40.8443 EDT [Polaris Coverity Capture] INFO: Executing action Delete stale TUs /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir
+2026-04-16 10:13:40.8444 EDT [Polaris Coverity Capture] INFO: Executing command: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-manage-emit --dir /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir list-capture-diagnostics
+2026-04-16 10:13:40.8759 EDT [Polaris Coverity Capture] INFO: Executing action Invalidate capture results
+2026-04-16 10:13:40.8759 EDT [Polaris Coverity Capture] INFO: Executing action Invoke cov-run-sigma: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-run-sigma --project-dir /Users/jmcdermott/Desktop/nasa-dashboard --dir /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir --coverity-config /var/folders/7r/t77kn3vx51x6qsz3lcy8s7pm0000gp/T/cov-run-sigma-config-2777777749/coverity.yaml --sigma-binary-path /Users/jmcdermott/.blackduck/bridge/tools/sigma/2026.3.0/sigma --enable-telemetry
+2026-04-16 10:13:41.3936 EDT [Polaris Coverity Capture] INFO: cov-run-sigma version 2025.12.0 on Darwin 24.1.0 arm64
+2026-04-16 10:13:41.3937 EDT [Polaris Coverity Capture] INFO: Internal version numbers: 8600bcfa3c p-2025.12-push-40
+2026-04-16 10:13:41.3937 EDT [Polaris Coverity Capture] INFO: 
+2026-04-16 10:13:49.5440 EDT [Polaris Coverity Capture] INFO: Executing action Action cleanup: Coverity configuration for Sigma
+2026-04-16 10:13:49.5825 EDT [Polaris Coverity Capture] INFO: Executing command: /Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/cov-manage-emit --dir /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir list-capture-diagnostics
+2026-04-16 10:13:49.6149 EDT [Polaris Coverity Capture] INFO: Capture summary:
+2026-04-16 10:13:49.6149 EDT [Polaris Coverity Capture] INFO:     SUCCEEDED: 733
+2026-04-16 10:13:49.6149 EDT [Polaris Coverity Capture] INFO:     INCOMPLETE: 0
+2026-04-16 10:13:49.6149 EDT [Polaris Coverity Capture] INFO:     FAILED: 0
+2026-04-16 10:13:49.6149 EDT [Polaris Coverity Capture] INFO:     IGNORED: 768
+2026-04-16 10:13:49.6149 EDT [Polaris Coverity Capture] INFO:     FILES CAPTURED: 733
+2026-04-16 10:13:49.6150 EDT [Polaris Coverity Capture] INFO:     LINES OF CODE: 199317
+2026-04-16 10:13:49.6166 EDT [Polaris Coverity Capture] INFO: Capture phase took 18.992s.
+2026-04-16 10:13:49.8627 EDT [Polaris Coverity Capture] INFO: To analyze your project, type '/Users/jmcdermott/.blackduck/bridge/tools/cov-thin-client/2025.12.0/bin/coverity analyze --project-dir /Users/jmcdermott/Desktop/nasa-dashboard --dir /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/2025.12.0/idir -o analyze.location=connect'.
+2026-04-16 10:13:49.8647 EDT [Polaris Coverity Capture] INFO: Coverity Capture completed successfully
+2026-04-16 10:13:49.8767 EDT [Polaris Coverity Capture] INFO: Provided value for resource 'coverity.completed'
+2026-04-16 10:13:49.8769 EDT [Polaris Coverity Capture] INFO: Provided value for resource 'coverity.idir.output'
+2026-04-16 10:13:49.8771 EDT [Polaris Coverity Capture] INFO: Provided value for resource 'polaris.test.sast.tests.sastFull.artifacts.path'
+2026-04-16 10:13:49.8772 EDT [Polaris Coverity Capture] INFO: Adapter finished
+2026-04-16 10:13:50.5379 EDT [Polaris SCA Package Manager Scan] INFO: Running command java -jar /Users/jmcdermott/.blackduck/bridge/tools/blackduck-detect/10.4.0/detect-10.4.0.jar --detect.cleanup=false --detect.bdio.file.name=scan --detect.bdio.output.path=/Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_sca_package_manager_scan/detect/bdio/blackduck_artifact --detect.output.path=/Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_sca_package_manager_scan/detect --detect.tools=DETECTOR --detect.component.location.analysis.enabled=true --blackduck.offline.mode=true --blackduck.offline.mode.force.bdio=true --detect.source.path=/Users/jmcdermott/Desktop/nasa-dashboard
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] WARNING: --- Detect-Self-Updater:  Self-Update feature is disabled because of the following reasons:
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] WARNING: --- Detect-Self-Updater:  Detect in offline mode is incompatible with the Self-Update feature.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] WARNING: --- Detect-Self-Updater:  Black Duck URL is required for the Self-Update feature.
+2026-04-16 10:13:51.1942 EDT [Polaris SCA Package Manager Scan] INFO: ______     _            _
+2026-04-16 10:13:51.1943 EDT [Polaris SCA Package Manager Scan] INFO: |  _  \   | |          | |
+2026-04-16 10:13:51.1943 EDT [Polaris SCA Package Manager Scan] INFO: | | | |___| |_ ___  ___| |_
+2026-04-16 10:13:51.1943 EDT [Polaris SCA Package Manager Scan] INFO: | | | / _ \ __/ _ \/ __| __|
+2026-04-16 10:13:51.1943 EDT [Polaris SCA Package Manager Scan] INFO: | |/ /  __/ ||  __/ (__| |_
+2026-04-16 10:13:51.1943 EDT [Polaris SCA Package Manager Scan] INFO: |___/ \___|\__\___|\___|\__|
+2026-04-16 10:13:51.1943 EDT [Polaris SCA Package Manager Scan] INFO: 
+2026-04-16 10:13:51.2717 EDT [Polaris SCA Package Manager Scan] INFO: 
+2026-04-16 10:13:51.2717 EDT [Polaris SCA Package Manager Scan] INFO: Detect Version: 10.4.0
+2026-04-16 10:13:51.2717 EDT [Polaris SCA Package Manager Scan] INFO: 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Current property values:
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- --property = value [notes]
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ------------------------------------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- blackduck.offline.mode = true [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- blackduck.offline.mode.force.bdio = true [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- detect.bdio.file.name = scan [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- detect.bdio.output.path = /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_sca_package_manager_scan/detect/bdio/blackduck_artifact [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- detect.cleanup = false [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- detect.component.location.analysis.enabled = true [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- detect.excluded.directories = /Users/jmcdermott/Desktop/nasa-dashboard/.bridge [env] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- detect.output.path = /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_sca_package_manager_scan/detect [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- detect.source.path = /Users/jmcdermott/Desktop/nasa-dashboard [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- detect.tools = DETECTOR [cmd] 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ------------------------------------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Detect build date: 2025-04-24
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Source directory: /Users/jmcdermott/Desktop/nasa-dashboard
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Output directory: /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_sca_package_manager_scan/detect
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Run directory: /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_sca_package_manager_scan/detect/runs/2026-04-16-14-13-51-250
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] WARNING: --- Correlated Scanning is not available for Rapid/Stateless scan mode or offline scanning. A correlation ID will not be set.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Docker tool will not be run.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Bazel tool will not be run.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Will include the Detectors tool.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Searching for detectors.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Evaluating detectors. This may take a while.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Running executable >/usr/bin/git config --get remote.origin.url
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Process return code: 0
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Running executable >/usr/bin/git rev-parse --abbrev-ref HEAD
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Process return code: 0
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Running executable >/usr/bin/git rev-parse HEAD
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Process return code: 0
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ======================================================================================================
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Detector Report
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ======================================================================================================
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 	/Users/jmcdermott/Desktop/nasa-dashboard (depth 0)
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 		PIP Requirements Parse: SUCCESS
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 			Found file: /Users/jmcdermott/Desktop/nasa-dashboard/requirements.txt
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 		PIP Native Inspector: ATTEMPTED
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 			No python executable was found.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 		Pipfile Lock: ATTEMPTED
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 			No files were found with any of the patterns: Pipfile,Pipfile.lock
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 		Git: SUCCESS
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 			Found file: /Users/jmcdermott/Desktop/nasa-dashboard/.git
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 			Found executable: /usr/bin/git
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Detectors actions finished.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Project name: jessymcdermott/nasa-dashboard
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Project version: main
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Signature Scanner tool will not be run.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Vulnerability Impact Analysis tool will not be run.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- IaC Scanner tool will not be run.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Component Location Analysis requires non-empty BDIO results. Skipping location analysis.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ----------------------------------
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Creating status file: /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_sca_package_manager_scan/detect/runs/2026-04-16-14-13-51-250/status/status.json
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Skipping cleanup, it is disabled.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ======== Detect Issues ========
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- DETECTORS:
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 	Detector Issue
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 		Accuracy Not Met: PIP
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 			Extraction for PIP Requirements Parse has accuracy of LOW but HIGH is required by the current detect.accuracy.required configuration.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- EXCEPTIONS:
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 	Generating Component Location Analysis File for All Components
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 		Failed to generate Component Location Analysis file.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ======== Detect Status ========
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- GIT: SUCCESS
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- PIP: SUCCESS
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] ERROR: --- Overall Status: FAILURE_ACCURACY_NOT_MET - Detect was unable to meet the required accuracy.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- If you need help troubleshooting this problem, generate a diagnostic zip file by adding '-d' to the command line, and provide it to Black Duck Technical Support. See 'Diagnostic Mode' in the Detect documentation for more information.
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- ===============================
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- 
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] INFO: --- Detect duration: 00h 00m 01s 005ms
+2026-04-16 10:13:51.0000 EDT [Polaris SCA Package Manager Scan][main] ERROR: --- Exiting with code 15 - FAILURE_ACCURACY_NOT_MET
+2026-04-16 10:13:51.8646 EDT [Polaris SCA Package Manager Scan] ERROR: exit status 15
+2026-04-16 10:13:51.8763 EDT [Polaris SCA Package Manager Scan] ERROR: Adapter failed: exit status 1
+2026-04-16 10:13:52.6308 EDT [Polaris Artifacts Uploader] INFO: uploading artifact for "SAST(sastFull)" assessment with id "f6968156-9869-4614-a40d-e913ee128e4d"
+2026-04-16 10:13:52.6310 EDT [Polaris Artifacts Uploader] INFO: uploading artifact for "SCA(scaPackage)" assessment with id "463186fb-10a4-4738-9cf7-60fbb3ab243d"
+2026-04-16 10:13:52.6311 EDT [Polaris Artifacts Uploader] ERROR: error while uploading the artifact for "SCA(scaPackage)" assessment: artifact was not found
+2026-04-16 10:13:53.1642 EDT [Polaris Artifacts Uploader] INFO: failed the test for "SCA(scaPackage)" assessment with id "463186fb-10a4-4738-9cf7-60fbb3ab243d"
+2026-04-16 10:13:53.2559 EDT [Polaris Artifacts Uploader] INFO: Uploading artifact /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/idir.zip for "SAST(sastFull)" assessment
+2026-04-16 10:13:53.3767 EDT [Polaris Artifacts Uploader] INFO: Uploading Progress of "SAST(sastFull)" artifact:   0%  16384/15105423
+2026-04-16 10:13:53.6026 EDT [Polaris Artifacts Uploader] INFO: Uploading Progress of "SAST(sastFull)" artifact:  25%  3784704/15105423
+2026-04-16 10:13:53.7670 EDT [Polaris Artifacts Uploader] INFO: Uploading Progress of "SAST(sastFull)" artifact:  50%  7553024/15105423
+2026-04-16 10:13:53.9526 EDT [Polaris Artifacts Uploader] INFO: Uploading Progress of "SAST(sastFull)" artifact:  75%  11337728/15105423
+2026-04-16 10:13:54.1239 EDT [Polaris Artifacts Uploader] INFO: Uploading Progress of "SAST(sastFull)" artifact: 100%  15105423/15105423
+2026-04-16 10:13:54.4865 EDT [Polaris Artifacts Uploader] INFO: successfully uploaded artifact "/Users/jmcdermott/Desktop/nasa-dashboard/.bridge/polaris_coverity_capture/idir.zip"
+2026-04-16 10:13:54.7587 EDT [Polaris Artifacts Uploader] INFO: successfully resumed "SAST(sastFull)" assessment with id "f6968156-9869-4614-a40d-e913ee128e4d"
+2026-04-16 10:13:54.7886 EDT [Polaris Artifacts Uploader] INFO: Provided value for resource 'polaris.test.sast.tests.sastFull.artifacts.uploadSuccessful'
+2026-04-16 10:13:54.7888 EDT [Polaris Artifacts Uploader] ERROR: Adapter failed: exit status 1
+2026-04-16 10:13:55.2863 EDT [Polaris Waiter] INFO: Waiting for test with assessment type "SAST(sastFull)" and id "f6968156-9869-4614-a40d-e913ee128e4d"
+2026-04-16 10:13:55.2865 EDT [Polaris Waiter] INFO: Waiting for test with assessment type "SCA(scaPackage)" and id "463186fb-10a4-4738-9cf7-60fbb3ab243d"
+2026-04-16 10:13:55.2867 EDT [Polaris Waiter] ERROR: error while waiting for test with assessment type "SCA(scaPackage)" and id "463186fb-10a4-4738-9cf7-60fbb3ab243d": the artifact uploaded was found unsuccessful
+2026-04-16 10:13:55.4615 EDT [Polaris Waiter] INFO: Polling Test Manager: state of test with assessment type "SAST(sastFull)" and id "f6968156-9869-4614-a40d-e913ee128e4d" is "Waiting for Capture"
+2026-04-16 10:14:05.7097 EDT [Polaris Waiter] INFO: Polling Test Manager: state of test with assessment type "SAST(sastFull)" and id "f6968156-9869-4614-a40d-e913ee128e4d" is "Queuing"
+2026-04-16 10:14:15.9026 EDT [Polaris Waiter] INFO: Polling Test Manager: state of test with assessment type "SAST(sastFull)" and id "f6968156-9869-4614-a40d-e913ee128e4d" is "Scanning"

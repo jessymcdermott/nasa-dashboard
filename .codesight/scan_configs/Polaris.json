@@ -1,0 +1,103 @@
+{
+  "configId": {
+    "id": "5f8fbb2b-e605-4eb4-888e-51f8152877ab"
+  },
+  "scanType": {
+    "type": 1,
+    "name": "Polaris",
+    "supportsDiffing": true,
+    "description": "Runs both static and software composition analysis scans. Detects hard-coded secrets, security defects, and vulnerabilities in both proprietary and open source code."
+  },
+  "coverityConfig": {
+    "configFilePath": {
+      "source": {
+        "type": 8
+      }
+    },
+    "additionalAnalysisArguments": {
+      "source": {
+        "type": 8
+      }
+    }
+  },
+  "blackDuckConfig": {
+    "additionalArguments": {
+      "source": {
+        "type": 8
+      }
+    },
+    "configFilePath": {
+      "source": {
+        "type": 8
+      }
+    },
+    "searchDepth": {
+      "source": {
+        "type": 8
+      }
+    }
+  },
+  "bridgeConfig": {
+    "installationLocation": {
+      "source": {
+        "type": 8
+      }
+    },
+    "additionalArguments": {
+      "source": {
+        "type": 8
+      }
+    },
+    "configFilePath": {
+      "source": {
+        "type": 8
+      }
+    },
+    "scanTypes": [
+      0,
+      1
+    ]
+  },
+  "issueSource": {
+    "reference": {
+      "info": {
+        "name": "Webgoat SCM",
+        "id": "374353a3-507b-4037-b3b5-f7cce77c3885",
+        "displayName": "Webgoat SCM",
+        "depth": 2
+      },
+      "parent": {
+        "info": {
+          "name": "WebGoat",
+          "id": "98e86a8e-bd4b-4163-a6f8-f8529f54b096",
+          "displayName": "WebGoat",
+          "depth": 1,
+          "localId": "polaris.blackduck.com--WebGoat-98e86a8e-bd4b-4163-a6f8-f8529f54b096"
+        }
+      }
+    }
+  },
+  "buildConfig": {
+    "buildCommand": {
+      "source": {
+        "type": 8
+      }
+    },
+    "cleanCommand": {
+      "source": {
+        "type": 8
+      }
+    }
+  },
+  "workingDirectory": {
+    "value": "/Users/jmcdermott/Desktop/nasa-dashboard",
+    "source": {
+      "type": 8
+    }
+  },
+  "path": {
+    "source": {
+      "type": 8
+    }
+  }
+}
