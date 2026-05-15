@@ -32,6 +32,6 @@ jobs:
           polaris_server_url: ${{ vars.POLARIS_URL }}
           polaris_access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
           ### ASSESSMENT TYPES
-          polaris_assessment_types: SAST  # Comma-separated list: SAST,SCA,DAST
+          polaris_assessment_types: SCA  # Comma-separated list: SAST,SCA,DAST
           ### SCANNING: Optional fields
-          polaris_test_sast_location: hybrid
+          polaris_test_sca_location: hybrid
