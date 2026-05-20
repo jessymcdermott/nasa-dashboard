@@ -1,16 +1,16 @@
-name: jessy-nasa-dashboard CI
+name: Polaris Security Scan
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
 
 jobs:
-  blackduck-scan:
+  polaris-scan:
     runs-on: ubuntu-latest
-
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
       - name: Checkout code
@@ -25,22 +25,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
 
-      - name: Run Black Duck Polaris Scan
+      - name: Polaris Scan
         uses: blackduck-inc/black-duck-security-scan@v2
         with:
           polaris_server_url: ${{ secrets.POLARIS_SERVER_URL }}
           polaris_access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
-          polaris_application_name: jessy-nasa-dashboard
-          polaris_project_name: jessy-nasa-dashboard
-          polaris_branch_name: main
+          polaris_application_name: "jessy-nasa-dashboard"
+          polaris_project_name: "jessy-nasa-dashboard"
           polaris_assessment_types: "SCA"
-
-          detect_args: >
-            --detect.cleanup=false
-            --detect.tools=DETECTOR
+          polaris_branch_name: ${{ github.ref_name }}
+          polaris_prcomment_enabled: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
