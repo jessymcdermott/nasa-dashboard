@@ -10,6 +10,7 @@ on:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,39 +18,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - name: Run Black Duck Polaris Scan
+        uses: blackduck-inc/black-duck-security-scan@v2
         with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Download Bridge CLI
-        run: |
-          curl -fLsS -o bridge.zip https://repo.blackduck.com/bds-integrations-release/com/blackduck/integration/bridge/binaries/bridge-cli-bundle/latest/bridge-cli-bundle-linux64.zip
-          unzip -q bridge.zip -d $HOME/bridge-cli
-          chmod +x $HOME/bridge-cli/bridge-cli
-
-     # - name: Run Black Duck SCA Scan
-      #  env:
-      #    BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
-      #    BLACKDUCK_TOKEN: ${{ secrets.BLACKDUCK_TOKEN }}
-      #  run: |
-       #   $HOME/bridge-cli/bridge-cli --stage blackducksca \
-        #    blackducksca.url="$BLACKDUCK_URL" \
-         #   blackducksca.token="$BLACKDUCK_TOKEN" \
-          #  project.directory="$GITHUB_WORKSPACE"
-
-      - name: Run Polaris SAST Scan
-        env:
-          POLARIS_URL: ${{ secrets.POLARIS_SERVER_URL }}
-          POLARIS_TOKEN: ${{ secrets.POLARIS_TOKEN }}
-        run: |
-          $HOME/bridge-cli/bridge-cli --stage polaris \
-            polaris.url="$POLARIS_URL" \
-            polaris.token="$POLARIS_TOKEN" \
-            project.directory="$GITHUB_WORKSPACE"
+          polaris_server_url: ${{ secrets.POLARIS_SERVER_URL }}
+          polaris_access_token: ${{ secrets.POLARIS_TOKEN }}
+          polaris_application_name: nasa-dashboard
+          polaris_project_name: nasa-dashboard
+          polaris_branch_name: ${{ github.ref_name }}
+          polaris_assessment_types: SCA
+          polaris_test_sca_location: hybrid
