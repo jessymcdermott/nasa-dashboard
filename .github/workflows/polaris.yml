@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  blackduck-scan:
     runs-on: ubuntu-latest
 
     env:
@@ -21,17 +21,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Python build dependencies (FIX for pkg_resources error)
+      - name: Install Python dependencies (fix pkg_resources issue)
         run: |
           python -m pip install --upgrade pip setuptools wheel
 
-      - name: Set up Java
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Black Duck Polaris Scan
+      - name: Run Black Duck Polaris Scan
         uses: blackduck-inc/black-duck-security-scan@v2
         with:
           polaris_server_url: ${{ secrets.POLARIS_SERVER_URL }}
@@ -40,8 +40,6 @@ jobs:
           polaris_project_name: jessy-nasa-dashboard
           polaris_branch_name: main
           polaris_assessment_types: "SCA"
-
-          # IMPORTANT: remove invalid input detect_accuracy_required
 
           detect_args: >
             --detect.cleanup=false
