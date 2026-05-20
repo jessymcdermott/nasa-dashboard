@@ -37,5 +37,4 @@ jobs:
           polaris_prcomment_enabled: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-          polaris_additional_parameters:
-            detect.accuracy.required=MEDIUM
+          polaris_additional_parameters: detect.accuracy.required=MEDIUM
