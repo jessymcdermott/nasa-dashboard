@@ -1,6 +1,4 @@
-cat < ~/Desktop/asa-dashboard/.github/workflows/blackduck.yml << 'EOF'
-
-name: Black Duck Security Scan
+name: Black Duck Polaris Scan
 
 on:
   push:
@@ -34,9 +32,7 @@ jobs:
         run: |
           curl -fLsS -o bridge.zip https://repo.blackduck.com/bds-integrations-release/com/blackduck/integration/bridge/binaries/bridge-cli-bundle/latest/bridge-cli-bundle-linux64.zip
           unzip -q bridge.zip -d $HOME/bridge-cli
-          BRIDGE_BIN=$(find $HOME/bridge-cli -name "bridge-cli" -type f | head -1)
-          chmod +x $BRIDGE_BIN
-          echo "BRIDGE_CLI=$BRIDGE_BIN" >> $GITHUB_ENV
+          chmod +x $HOME/bridge-cli/bridge-cli
 
       - name: Run Black Duck SCA Scan
         env:
@@ -53,4 +49,7 @@ jobs:
           POLARIS_URL: ${{ secrets.POLARIS_URL }}
           POLARIS_TOKEN: ${{ secrets.POLARIS_TOKEN }}
         run: |
-          $HOME/brid
+          $HOME/bridge-cli/bridge-cli --stage polaris \
+            polaris.url="$POLARIS_URL" \
+            polaris.token="$POLARIS_TOKEN" \
+            project.directory="$GITHUB_WORKSPACE"
