@@ -26,7 +26,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
           pip install pip-tools
-          pip-compile requrirments.txt -o requirements.lock
+          pip-compile requirements.txt -o requirements.lock
 
       - name: Polaris Scan
         uses: blackduck-inc/black-duck-security-scan@v2
