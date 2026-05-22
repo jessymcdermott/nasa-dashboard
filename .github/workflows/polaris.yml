@@ -37,5 +37,5 @@ jobs:
           polaris_project_name: "jessy-nasa-dashboard"
           polaris_assessment_types: "SCA"
           polaris_branch_name: ${{ github.ref_name }}
-          polaris_prcomment_enabled: true
+          polaris_prComment_enabled: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
