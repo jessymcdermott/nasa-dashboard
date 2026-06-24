@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "type": "codexm-debug",
+            "request": "launch",
+            "name": "Sample CodeXM Checker Configuration",
+            "targetedSourceFiles": [
+                "/Users/jmcdermott/.blackduck/cxm/sample/SampleSourceFile.js"
+            ],
+            "cxmFiles": [
+                "/Users/jmcdermott/.blackduck/cxm/sample/SampleChecker.cxm"
+            ],
+            "buildCommand": ""
+        }
+    ]
+}
