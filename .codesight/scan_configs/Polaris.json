@@ -61,18 +61,18 @@
   "issueSource": {
     "reference": {
       "info": {
-        "name": "Webgoat SCM",
-        "id": "374353a3-507b-4037-b3b5-f7cce77c3885",
-        "displayName": "Webgoat SCM",
+        "name": "jessy-nasa-dashboard",
+        "id": "4c55e0cf-9fe6-4b9e-9d10-ae354c4c93f7",
+        "displayName": "jessy-nasa-dashboard",
         "depth": 2
       },
       "parent": {
         "info": {
-          "name": "WebGoat",
-          "id": "98e86a8e-bd4b-4163-a6f8-f8529f54b096",
-          "displayName": "WebGoat",
+          "name": "jessy-nasa-dashboard",
+          "id": "2c2470d2-ac5c-44e9-a59b-492a07195a45",
+          "displayName": "jessy-nasa-dashboard",
           "depth": 1,
-          "localId": "polaris.blackduck.com--WebGoat-98e86a8e-bd4b-4163-a6f8-f8529f54b096"
+          "localId": "polaris.blackduck.com--jessy-nasa-dashboard-2c2470d2-ac5c-44e9-a59b-492a07195a45"
         }
       }
     }
