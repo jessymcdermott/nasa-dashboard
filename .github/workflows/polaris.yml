@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901fc75794662edbb965a5bc2a6e66e5e9
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0a5c47080f01d68f4b69b27a841e1e5395180200
         with:
           python-version: "3.11"
 
