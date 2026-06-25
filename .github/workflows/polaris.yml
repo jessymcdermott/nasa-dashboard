@@ -35,8 +35,8 @@ jobs:
         run: |
           python -c "import pkg_resources; print('pkg_resources OK')"
 
-      - name: Polaris Scan
-        uses: blackduck-inc/black-duck-security-scan@v2
+      - name: Black Duck Security Scan
+        uses: blackduck-inc/black-duck-security-scan@v2.10.0
         env:
           DETECT_PYTHON_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/bin/python
           DETECT_ACCURACY_REQUIRED: NONE
