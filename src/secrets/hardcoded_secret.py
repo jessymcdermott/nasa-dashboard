@@ -1,1 +1,1 @@
-
+password = 'ThisIsBadPractice123!'  # Hardcoded password, should be avoided
