@@ -1,1 +1,27 @@
+{
+  "project": "nasa-dashboard",
+  "version": "1.0",
 
+  "components": [
+    {
+      "name": "requests",
+      "version": "2.25.1",
+      "risk": "high"
+    },
+    {
+      "name": "urllib3",
+      "version": "1.26.5",
+      "risk": "critical"
+    },
+    {
+      "name": "certifi",
+      "version": "2021.5.30",
+      "risk": "medium"
+    },
+    {
+      "name": "jinja2",
+      "version": "3.0.1",
+      "risk": "medium"
+    }
+  ]
+}

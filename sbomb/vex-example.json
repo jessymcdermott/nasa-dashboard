@@ -1,1 +1,16 @@
+{
+  "documentType": "VEX",
+  "product": "NASA Dashboard",
 
+  "vulnerabilities": [
+    {
+      "cve": "CVE-2024-TEST",
+      "status": "not_affected",
+      "justification": "component_not_reachable"
+    },
+    {
+      "cve": "CVE-2025-DEMO",
+      "status": "fixed"
+    }
+  ]
+}
