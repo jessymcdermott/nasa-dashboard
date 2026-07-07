@@ -1,0 +1,23 @@
+openapi: 3.0.0
+
+info:
+  title: NASA Dashboard API
+  version: 1.0.0
+
+paths:
+
+  /api/apod:
+    get:
+      summary: Astronomy Picture of the Day
+
+  /api/mars:
+    get:
+      summary: Mars Rover Photos
+
+  /api/neo:
+    get:
+      summary: Near Earth Objects
+
+  /api/iss:
+    get:
+      summary: ISS Position
