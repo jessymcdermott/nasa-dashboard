@@ -1,7 +1,0 @@
-{
-    "codeSight.scan.tool.configuration": {
-        "sigma": {
-            "sigmaAnalyzeOnChange": true
-        }
-    }
-}

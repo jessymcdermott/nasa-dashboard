@@ -1,2 +1,0 @@
-/Users/jmcdermott/bridge-cli/adapters/srm-initializer/versions/0.0.96/srm-initializer /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/srm_initializer/data.json
-{"level":"error","logger":"SRM Initializer","msg":"Both \"srm.project.id\" and \"srm.project.name\" are empty, any one of them is required","time":"2026-03-17 12:06:33.3822 EDT"}

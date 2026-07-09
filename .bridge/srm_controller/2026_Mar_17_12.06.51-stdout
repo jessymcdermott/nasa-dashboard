@@ -1,2 +1,0 @@
-/Users/jmcdermott/bridge-cli/adapters/srm-controller/versions/0.0.141/srm-controller /Users/jmcdermott/Desktop/nasa-dashboard/.bridge/srm_controller/data.json
-{"level":"error","logger":"SRM Controller","msg":"Initialization step failed - stopping workflow.","time":"2026-03-17 12:06:51.2522 EDT"}
