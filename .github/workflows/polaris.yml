@@ -41,9 +41,7 @@ jobs:
           polaris_access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
           polaris_application_name: "jessy-nasa-dashboard"
           polaris_project_name: "jessy-nasa-dashboard"
-          polaris_assessment_types: "SAST,SCA"
-          polaris_test_sast_location: hybrid
-          polaris_test_sca_location: hybrid
+          polaris_assessment_types: "SAST"
           polaris_branch_name: ${{ github.ref_name }}
           polaris_prComment_enabled: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
