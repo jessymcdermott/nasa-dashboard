@@ -1,0 +1,87 @@
+# Polaris scan using the Bridge CLI directly (alternative to the
+# Black Duck Security Scan Action used in polaris.yml).
+# Docs: Quickstart: Polaris Bridge CLI in a GitHub workflow
+name: polaris-bridge-cli
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  polaris:
+    runs-on: ubuntu-latest
+    env:
+      BRIDGE_POLARIS_SERVERURL: ${{ secrets.POLARIS_SERVER_URL }}
+      BRIDGE_POLARIS_ACCESSTOKEN: ${{ secrets.POLARIS_ACCESSTOKEN }}
+      BRIDGE_POLARIS_ASSESSMENT_TYPES: 'SAST,SCA'
+      BRIDGE_POLARIS_APPLICATION_NAME: 'jessy-nasa-dashboard'
+      BRIDGE_POLARIS_PROJECT_NAME: 'jessy-nasa-dashboard'
+      BRIDGE_POLARIS_BRANCH_NAME: ${{ github.ref_name }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Polaris Full Scan
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          BRIDGE_POLARIS_FIXPR_ENABLED: true
+
+          ## External Issues Parameters
+          #
+          # Uncomment environment variable below to create an issue for each scan finding
+          # Defaults to false.
+          # BRIDGE_POLARIS_EXTERNALISSUES_CREATE: true
+          #
+          # Uncomment environment variable below to filter issue creation by severity
+          # Defaults to Critical,High
+          # BRIDGE_POLARIS_EXTERNALISSUES_SEVERITIES: 'Critical,High'
+          #
+          # Uncomment environment variable below to filter issue creation by assessment type
+          # BRIDGE_POLARIS_EXTERNALISSUES_TYPES: "SAST,SCA"
+          #
+          # Uncomment environment variable below to limit the number of issues created from
+          # scan findings, Default limit is 10.
+          # BRIDGE_POLARIS_EXTERNALISSUES_MAXCOUNT: 10
+          #
+          # Uncomment environment variable below to group sca issues by vulnerabilities of a
+          # component version pair. Default is true.
+          # BRIDGE_POLARIS_EXTERNALISSUES_GROUPSCAISSUES: true
+          #
+          ##
+        run: |
+          curl -fLsS -o bridge.zip ${{ vars.BRIDGECLI_LINUX64 }} && unzip -qo -d ${{ runner.temp }} bridge.zip && rm -f bridge.zip
+          ${{ runner.temp }}/bridge-cli-bundle-linux64/bridge-cli --stage polaris \
+          github.user.token=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Polaris PR Scan
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          curl -fLsS -o bridge.zip ${{ vars.BRIDGECLI_LINUX64 }} && unzip -qo -d ${{ runner.temp }} bridge.zip && rm -f bridge.zip
+          ${{ runner.temp }}/bridge-cli-bundle-linux64/bridge-cli --stage polaris \
+              polaris.prcomment.enabled=true \
+              polaris.branch.parent.name=${{ github.event.pull_request.base.ref }} \
+              github.repository.branch.name=${{ github.event.pull_request.head.ref }} \
+              github.repository.name=${{ github.event.repository.name }} \
+              github.repository.owner.name=${{ github.repository_owner }} \
+              github.repository.pull.number=${{ github.event.number }} \
+              github.user.token=${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Save Logs
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: bridge-logs
+#          path: ${{ github.workspace }}/.bridge
