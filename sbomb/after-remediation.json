@@ -22,6 +22,51 @@
       "name": "jinja2",
       "version": "3.1.4",
       "risk": "none"
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.1",
+      "risk": "none"
+    },
+    {
+      "name": "pillow",
+      "version": "10.3.0",
+      "risk": "none"
+    },
+    {
+      "name": "cryptography",
+      "version": "42.0.5",
+      "risk": "none"
+    },
+    {
+      "name": "gunicorn",
+      "version": "22.0.0",
+      "risk": "none"
+    },
+    {
+      "name": "lxml",
+      "version": "5.2.1",
+      "risk": "none"
+    },
+    {
+      "name": "lodash",
+      "version": "4.17.21",
+      "risk": "none"
+    },
+    {
+      "name": "axios",
+      "version": "1.6.8",
+      "risk": "none"
+    },
+    {
+      "name": "minimist",
+      "version": "1.2.8",
+      "risk": "none"
+    },
+    {
+      "name": "node-fetch",
+      "version": "2.6.7",
+      "risk": "none"
     }
   ]
 }

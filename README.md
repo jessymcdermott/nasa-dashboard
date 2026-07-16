@@ -47,6 +47,6 @@ Open [http://localhost:5000](http://localhost:5000)
 
 This project is intentionally structured to exercise both SAST and SCA scanning:
 
-- **SCA targets**: `requirements.txt` uses older pinned versions of Flask, Werkzeug, urllib3, Jinja2, and certifi — these should surface known CVEs
-- **SAST surface**: HTTP calls with user-supplied query params passed to external APIs, no input sanitization
-- **Dependencies to watch**: `requests==2.25.1`, `urllib3==1.26.5`
+- **SCA targets**: `requirements.txt` uses older pinned versions of Flask, Werkzeug, urllib3, Jinja2, certifi, PyYAML, Pillow, cryptography, gunicorn, and lxml — these should surface known CVEs, most with fixes available. `package/package.json` similarly pins vulnerable versions of lodash, axios, minimist, and node-fetch.
+- **SAST surface**: HTTP calls with user-supplied query params passed to external APIs, no input sanitization; see `src/vulnerable/` for standalone SQL injection, command injection, insecure deserialization, path traversal, weak crypto, and XXE examples
+- **Dependencies to watch**: `requests==2.25.1`, `urllib3==1.26.5`, `PyYAML==5.3.1`, `Pillow==8.1.0`, `cryptography==3.3.1`, `gunicorn==20.0.4`, `lxml==4.6.2`
