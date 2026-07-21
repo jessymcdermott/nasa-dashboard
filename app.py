@@ -80,11 +80,11 @@ def neo():
 @app.route("/api/iss")
 def iss():
     try:
-        resp = requests.get("http://api.open-notify.org/iss-now.json", timeout=10)
+        resp = requests.get("https://api.open-notify.org/iss-now.json", timeout=10)
         resp.raise_for_status()
         data = resp.json()
         # Also grab who's on the ISS
-        crew_resp = requests.get("http://api.open-notify.org/astros.json", timeout=10)
+        crew_resp = requests.get("https://api.open-notify.org/astros.json", timeout=10)
         crew = crew_resp.json() if crew_resp.ok else {}
         return jsonify({**data, "crew": crew.get("people", [])})
     except requests.RequestException as e:
