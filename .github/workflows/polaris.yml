@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.9"
 
       - name: Install system build dependencies
         run: |
@@ -36,10 +36,12 @@ jobs:
       - name: Verify pkg_resources
         run: |
           python -c "import pkg_resources; print('pkg_resources OK')"
+      - name: Resolve Python path
+        run: echo "DETECT_PYTHON_PATH=$(which python)" >> "$GITHUB_ENV"
+
       - name: Polaris Scan
         uses: blackduck-inc/black-duck-security-scan@v2
         env:
-          DETECT_PYTHON_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/bin/python
           DETECT_ACCURACY_REQUIRED: NONE
         with:
           polaris_server_url: ${{ secrets.POLARIS_SERVER_URL }}
@@ -50,4 +52,31 @@ jobs:
           polaris_branch_name: ${{ github.ref_name }}
           polaris_prComment_enabled: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          
+
+  container-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build container image
+        run: docker build -t nasa-dashboard:${{ github.sha }} .
+
+      - name: Save image as archive for scanning
+        run: docker save nasa-dashboard:${{ github.sha }} -o nasa-dashboard.tar
+
+      - name: Polaris Container Scan
+        uses: blackduck-inc/black-duck-security-scan@v2
+        with:
+          polaris_server_url: ${{ secrets.POLARIS_SERVER_URL }}
+          polaris_access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
+          polaris_application_name: "jessy-nasa-dashboard"
+          polaris_project_name: "jessy-nasa-dashboard"
+          polaris_assessment_types: "SCA"
+          polaris_test_sca_type: "SCA-CONTAINER"
+          polaris_container_name: "nasa-dashboard"
+          polaris_artifactToUpload: "nasa-dashboard.tar"
+          polaris_branch_name: ${{ github.ref_name }}
+          polaris_prComment_enabled: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
