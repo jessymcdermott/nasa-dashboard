@@ -1,0 +1,12 @@
+venv/
+.env
+__pycache__/
+*.pyc
+.DS_Store
+.bridge/
+.codesight/
+.vscode/
+.git/
+.github/
+docs/
+test-data/
