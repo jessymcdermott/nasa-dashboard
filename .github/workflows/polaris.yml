@@ -75,7 +75,6 @@ jobs:
           polaris_project_name: "jessy-nasa-dashboard"
           polaris_assessment_types: "SCA"
           polaris_test_sca_type: "SCA-CONTAINER"
-          polaris_container_name: "nasa-dashboard"
           polaris_artifactToUpload: "nasa-dashboard.tar"
           polaris_branch_name: ${{ github.ref_name }}
           polaris_prComment_enabled: true
