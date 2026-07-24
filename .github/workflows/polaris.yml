@@ -96,6 +96,8 @@ jobs:
 
       - name: Black Duck SCA Scan
         uses: blackduck-inc/black-duck-security-scan@v2.11.0
+        env:
+          DETECT_ACCURACY_REQUIRED: NONE
         with:
           blackducksca_url: ${{ secrets.BLACKDUCKSCA_URL }}
           blackducksca_token: ${{ secrets.BLACKDUCKSCA_TOKEN }}
