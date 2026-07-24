@@ -80,3 +80,24 @@ jobs:
           polaris_branch_name: ${{ github.ref_name }}
           polaris_prComment_enabled: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  blackduck-sca-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Black Duck SCA Scan
+        uses: blackduck-inc/black-duck-security-scan@v2.11.0
+        with:
+          blackducksca_url: ${{ secrets.BLACKDUCKSCA_URL }}
+          blackducksca_token: ${{ secrets.BLACKDUCKSCA_TOKEN }}
+          blackducksca_scan_full: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
