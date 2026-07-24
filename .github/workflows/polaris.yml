@@ -67,7 +67,7 @@ jobs:
         run: docker save nasa-dashboard:${{ github.sha }} -o nasa-dashboard.tar
 
       - name: Polaris Container Scan
-        uses: blackduck-inc/black-duck-security-scan@v2
+        uses: blackduck-inc/black-duck-security-scan@v2.11.0
         with:
           polaris_server_url: ${{ secrets.POLARIS_SERVER_URL }}
           polaris_access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
@@ -75,6 +75,7 @@ jobs:
           polaris_project_name: "jessy-nasa-dashboard"
           polaris_assessment_types: "SCA"
           polaris_test_sca_type: "SCA-CONTAINER"
+          polaris_container_name: "nasa-dashboard"
           polaris_artifactToUpload: "nasa-dashboard.tar"
           polaris_branch_name: ${{ github.ref_name }}
           polaris_prComment_enabled: true
