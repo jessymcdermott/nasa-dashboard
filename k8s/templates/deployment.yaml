@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nasa-dashboard
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: nasa-dashboard
@@ -21,13 +21,13 @@ spec:
       automountServiceAccountToken: true
       containers:
         - name: nasa-dashboard
-          image: nasa-dashboard:latest
-          imagePullPolicy: Always
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 5000
           env:
             - name: NASA_API_KEY
-              value: "DEMO_KEY"
+              value: {{ .Values.nasaApiKey | quote }}
           securityContext:
             privileged: true
             runAsUser: 0

@@ -1,0 +1,15 @@
+replicaCount: 2
+
+image:
+  repository: nasa-dashboard
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 5000
+  nodePort: 30050
+
+# Intentionally hardcoded (mirrors src/secrets/hardcoded_secret.py) —
+# a Black Duck Code Sight scan target, not a real key.
+nasaApiKey: "DEMO_KEY"

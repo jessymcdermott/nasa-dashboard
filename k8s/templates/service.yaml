@@ -5,11 +5,11 @@ metadata:
   labels:
     app: nasa-dashboard
 spec:
-  type: NodePort
+  type: {{ .Values.service.type }}
   selector:
     app: nasa-dashboard
   ports:
     - protocol: TCP
-      port: 5000
+      port: {{ .Values.service.port }}
       targetPort: 5000
-      nodePort: 30050
+      nodePort: {{ .Values.service.nodePort }}

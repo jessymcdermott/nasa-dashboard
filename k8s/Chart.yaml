@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nasa-dashboard
+description: Helm chart for the NASA Space Dashboard (Black Duck Code Sight IaC scan target)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
