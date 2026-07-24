@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nasa-dashboard
+  labels:
+    app: nasa-dashboard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nasa-dashboard
+  template:
+    metadata:
+      labels:
+        app: nasa-dashboard
+    spec:
+      # Intentionally vulnerable-by-design (Black Duck IaC scan target) —
+      # hostNetwork/hostPath + privileged escape the pod sandbox entirely,
+      # and the hardcoded key mirrors src/secrets/hardcoded_secret.py.
+      hostNetwork: true
+      automountServiceAccountToken: true
+      containers:
+        - name: nasa-dashboard
+          image: nasa-dashboard:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          env:
+            - name: NASA_API_KEY
+              value: "DEMO_KEY"
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            allowPrivilegeEscalation: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+          volumeMounts:
+            - name: host-root
+              mountPath: /host
+      volumes:
+        - name: host-root
+          hostPath:
+            path: /
+            type: Directory
