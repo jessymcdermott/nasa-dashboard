@@ -270,8 +270,7 @@
 
     .mars-controls label { font-size: 13px; color: var(--muted); }
 
-    .mars-controls input[type="number"] {
-      width: 100px;
+    .mars-controls input[type="number"], .mars-controls select {
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
@@ -450,6 +449,7 @@
       <div class="apod-controls">
         <input type="date" id="apod-date" />
         <button class="btn" onclick="loadApod()">Load</button>
+        <button class="btn btn-ghost" onclick="loadRandomPhoto()">🎲 Surprise Me</button>
       </div>
       <div id="apod-content"><div class="loading"><div class="spinner"></div> Fetching today's image…</div></div>
     </div>
@@ -458,12 +458,16 @@
     <div id="panel-mars" class="panel">
       <div class="panel-header">
         <h2>Mars Rover Photos</h2>
-        <span class="subtitle">Curiosity · NASA Mars Photos API</span>
+        <span class="subtitle">Raw images · NASA's own mission feed</span>
       </div>
       <div class="mars-controls">
-        <label>Sol (Martian day):</label>
-        <input type="number" id="mars-sol" value="1000" min="1" max="4000" />
-        <button class="btn" onclick="loadMars()">Load</button>
+        <label>Rover:</label>
+        <select id="mars-rover" onchange="resetMarsPage()">
+          <option value="curiosity">Curiosity</option>
+          <option value="perseverance">Perseverance</option>
+        </select>
+        <button class="btn" onclick="resetMarsPage()">Newest</button>
+        <button class="btn btn-ghost" onclick="loadMars(marsPage + 1)">Older ›</button>
       </div>
       <div id="mars-content"><div class="loading"><div class="spinner"></div> Loading Mars photos…</div></div>
     </div>
@@ -509,7 +513,7 @@
       if (issInterval) { clearInterval(issInterval); issInterval = null; }
 
       if (id === "apod")  loadApod();
-      if (id === "mars")  loadMars();
+      if (id === "mars")  resetMarsPage();
       if (id === "neo")   loadNeo();
       if (id === "iss")   { loadIss(); issInterval = setInterval(loadIss, 5000); }
     }
@@ -548,31 +552,58 @@
       `);
     }
 
-    // ── Mars ──
-    async function loadMars() {
-      const sol = document.getElementById("mars-sol").value;
-      setContent("mars-content", `<div class="loading"><div class="spinner"></div> Loading sol ${sol}…</div>`);
+    // ── Random NASA Photo ──
+    async function loadRandomPhoto() {
+      setContent("apod-content", `<div class="loading"><div class="spinner"></div> Digging through NASA's archive…</div>`);
 
-      const res = await fetch(`/api/mars?sol=${sol}`);
+      const res = await fetch("/api/random-photo");
+      const data = await res.json();
+
+      if (data.error) { setContent("apod-content", errorHTML(data.error)); return; }
+
+      setContent("apod-content", `
+        <div class="card">
+          <img class="apod-image" src="${data.thumbnail}" alt="${data.title}" loading="lazy" />
+          <div class="apod-title">${data.title}</div>
+          <div class="apod-meta">${(data.date_created || "").slice(0, 10)}${data.center ? " · " + data.center : ""} · topic: ${data.topic}</div>
+          <div class="apod-explanation">${data.description || ""}</div>
+        </div>
+      `);
+    }
+
+    // ── Mars ──
+    let marsPage = 0;
+
+    function resetMarsPage() {
+      marsPage = 0;
+      loadMars(0);
+    }
+
+    async function loadMars(page) {
+      marsPage = page;
+      const rover = document.getElementById("mars-rover").value;
+      setContent("mars-content", `<div class="loading"><div class="spinner"></div> Loading ${rover}'s latest photos…</div>`);
+
+      const res = await fetch(`/api/mars?rover=${rover}&page=${page}`);
       const data = await res.json();
 
       if (data.error) { setContent("mars-content", errorHTML(data.error)); return; }
       if (!data.photos || data.photos.length === 0) {
-        setContent("mars-content", errorHTML(`No photos found for sol ${sol}. Try another Martian day.`));
+        setContent("mars-content", errorHTML(`No photos found for ${rover} on this page.`));
         return;
       }
 
       const grid = data.photos.map(p => `
         <div class="photo-item">
           <img src="${p.img_src}" alt="${p.camera.full_name}" loading="lazy" />
-          <div class="photo-label">${p.camera.name}</div>
+          <div class="photo-label">Sol ${p.sol} · ${p.camera.name}</div>
         </div>
       `).join("");
 
       setContent("mars-content", `
         <div class="card" style="padding:12px">
           <div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-bottom:12px">
-            ${data.total} photos taken · showing first ${data.photos.length}
+            ${data.total} photos total · page ${data.page + 1}
           </div>
           <div class="photo-grid">${grid}</div>
         </div>
