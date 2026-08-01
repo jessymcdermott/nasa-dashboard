@@ -28,6 +28,7 @@ venv\Scripts\activate           # Windows
 ```bash
 pip install -r requirements.txt
 ```
+> Use **Python 3.9** (matching the `Dockerfile`/CI) — the intentionally old pins in `requirements.txt` (`lxml`, `PyYAML`, `Pillow`, etc.) only ship precompiled wheels for 3.9, so newer Pythons will try to build them from source and can fail without system headers. If you're on a newer Python and just want to run the app/test a feature (not do SCA scanning), those packages aren't actually imported anywhere — `pip install Flask python-dotenv requests pyswisseph gunicorn` is all the app needs to run.
 
 **4. Set your NASA API key**
 ```bash
