@@ -4,7 +4,12 @@ Moshier mode (swe.FLG_MOSEPH) is used deliberately: it needs no downloaded
 ephemeris data files, works fully offline, and is accurate to a few
 arc-seconds for planets — plenty for astrology purposes.
 """
+from datetime import datetime, timezone as dt_timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
 import swisseph as swe
+
+from . import interpretations
 
 SIGNS = [
     "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
@@ -66,12 +71,17 @@ def _angle_between(lon1, lon2):
     return 360 - diff if diff > 180 else diff
 
 
-def _julian_day_ut(birth_date, birth_time, utc_offset):
+def _julian_day_ut(birth_date, birth_time, tz_name):
     year, month, day = (int(p) for p in birth_date.split("-"))
     hour, minute = (int(p) for p in birth_time.split(":"))
-    local_hours = hour + minute / 60
-    ut_hours = local_hours - utc_offset
-    return swe.julday(year, month, day, ut_hours)
+    try:
+        tz = ZoneInfo(tz_name)
+    except ZoneInfoNotFoundError:
+        raise ValueError(f"Unknown timezone: {tz_name}")
+    local_dt = datetime(year, month, day, hour, minute, tzinfo=tz)
+    utc_dt = local_dt.astimezone(dt_timezone.utc)
+    ut_hours = utc_dt.hour + utc_dt.minute / 60 + utc_dt.second / 3600
+    return swe.julday(utc_dt.year, utc_dt.month, utc_dt.day, ut_hours)
 
 
 def calculate_planets(jd_ut):
@@ -95,34 +105,49 @@ def calculate_houses(jd_ut, latitude, longitude):
     }, cusps
 
 
-def calculate_aspects(planets):
+def _find_aspects(name_lon_pairs):
     aspects = []
-    names = list(planets.keys())
-    for i in range(len(names)):
-        for j in range(i + 1, len(names)):
-            a, b = names[i], names[j]
-            angle = _angle_between(planets[a]["longitude"], planets[b]["longitude"])
-            for aspect_name, target_angle, orb in ASPECTS:
-                delta = abs(angle - target_angle)
-                if delta <= orb:
-                    aspects.append({
-                        "planet_a": a,
-                        "planet_b": b,
-                        "aspect": aspect_name,
-                        "angle": round(angle, 2),
-                        "orb": round(delta, 2),
-                    })
-                    break
+    for (name_a, lon_a), (name_b, lon_b) in name_lon_pairs:
+        angle = _angle_between(lon_a, lon_b)
+        for aspect_name, target_angle, orb in ASPECTS:
+            delta = abs(angle - target_angle)
+            if delta <= orb:
+                aspects.append({
+                    "planet_a": name_a,
+                    "planet_b": name_b,
+                    "aspect": aspect_name,
+                    "angle": round(angle, 2),
+                    "orb": round(delta, 2),
+                })
+                break
     return aspects
 
 
-def calculate_chart(birth_date, birth_time, latitude, longitude, utc_offset, chart_type="basic"):
+def calculate_aspects(planets):
+    names = list(planets.keys())
+    pairs = [
+        ((names[i], planets[names[i]]["longitude"]), (names[j], planets[names[j]]["longitude"]))
+        for i in range(len(names)) for j in range(i + 1, len(names))
+    ]
+    return _find_aspects(pairs)
+
+
+def calculate_cross_aspects(set_a, set_b):
+    """Aspects between two independent planet sets (e.g. transiting vs. natal)."""
+    pairs = [
+        ((name_a, pos_a["longitude"]), (name_b, pos_b["longitude"]))
+        for name_a, pos_a in set_a.items() for name_b, pos_b in set_b.items()
+    ]
+    return _find_aspects(pairs)
+
+
+def calculate_chart(birth_date, birth_time, latitude, longitude, tz_name, chart_type="basic"):
     """Returns a dict describing the natal chart.
 
     chart_type "basic" returns just Sun/Moon/Rising.
     chart_type "in_depth" returns full planets, houses, and aspects.
     """
-    jd_ut = _julian_day_ut(birth_date, birth_time, utc_offset)
+    jd_ut = _julian_day_ut(birth_date, birth_time, tz_name)
     planets = calculate_planets(jd_ut)
     house_data, cusps = calculate_houses(jd_ut, latitude, longitude)
 
@@ -136,10 +161,42 @@ def calculate_chart(birth_date, birth_time, latitude, longitude, utc_offset, cha
 
     for name, pos in planets.items():
         pos["house"] = _house_of(pos["longitude"], cusps)
+        pos["interpretation"] = interpretations.planet_interpretation(name, pos["sign"], pos["house"])
+
+    aspects = calculate_aspects(planets)
+    for a in aspects:
+        a["interpretation"] = interpretations.aspect_interpretation(a["planet_a"], a["planet_b"], a["aspect"])
+
+    house_data["ascendant"]["interpretation"] = (
+        f"Your Ascendant sets the first impression you give: {interpretations.SIGN_TRAIT.get(house_data['ascendant']['sign'], 'distinctive')}."
+    )
+    house_data["midheaven"]["interpretation"] = (
+        f"Your Midheaven shapes your public path: {interpretations.SIGN_TRAIT.get(house_data['midheaven']['sign'], 'distinctive')}."
+    )
 
     return {
         "chart_type": "in_depth",
         "planets": planets,
         "houses": house_data,
-        "aspects": calculate_aspects(planets),
+        "aspects": aspects,
+    }
+
+
+def calculate_transits(natal_planets, natal_cusps_longitudes):
+    """Current sky positions, their natal house placement, and aspects to the natal planets."""
+    now = datetime.now(dt_timezone.utc)
+    jd_ut = swe.julday(now.year, now.month, now.day, now.hour + now.minute / 60 + now.second / 3600)
+
+    transiting_planets = calculate_planets(jd_ut)
+    for name, pos in transiting_planets.items():
+        pos["house"] = _house_of(pos["longitude"], natal_cusps_longitudes)
+
+    aspects = calculate_cross_aspects(transiting_planets, natal_planets)
+    for a in aspects:
+        a["interpretation"] = interpretations.aspect_interpretation(a["planet_a"], a["planet_b"], a["aspect"])
+
+    return {
+        "as_of": now.isoformat(),
+        "transiting_planets": transiting_planets,
+        "aspects_to_natal": aspects,
     }

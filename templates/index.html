@@ -525,6 +525,50 @@
     }
 
     .astro-section-title:first-child { margin-top: 0; }
+
+    .astro-location-results {
+      position: relative;
+      margin-top: 6px;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .astro-location-results:empty { display: none; }
+
+    .astro-location-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-top: none;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .astro-location-option:first-child { border-top: 1px solid var(--border); }
+    .astro-location-option:hover { background: var(--surface); }
+
+    .astro-reading {
+      font-size: 12px;
+      color: #9ba3b8;
+      padding: 0 12px 14px !important;
+      border-bottom: 1px solid var(--border) !important;
+    }
+
+    .astro-reading-item {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #9ba3b8;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .astro-reading-item:last-child { border-bottom: none; }
+    .astro-reading-item strong { color: var(--text); }
   </style>
 </head>
 <body>
@@ -612,22 +656,6 @@
             <input type="time" id="astro-time" />
           </div>
           <div>
-            <label>Latitude</label>
-            <input type="number" id="astro-lat" placeholder="40.7128" step="0.0001" />
-          </div>
-          <div>
-            <label>Longitude</label>
-            <input type="number" id="astro-lon" placeholder="-74.0060" step="0.0001" />
-          </div>
-          <div>
-            <label>UTC Offset (birthplace)</label>
-            <input type="number" id="astro-utc" placeholder="-4" step="0.5" />
-          </div>
-          <div>
-            <label>Location Label (optional)</label>
-            <input type="text" id="astro-location" placeholder="New York, NY" maxlength="60" />
-          </div>
-          <div>
             <label>Chart Type</label>
             <select id="astro-type" onchange="toggleEmailField()">
               <option value="basic">Basic (Sun / Moon / Rising)</option>
@@ -639,12 +667,44 @@
             <input type="email" id="astro-email" placeholder="you@example.com" />
           </div>
         </div>
-        <div class="astro-hint">Lat/long + UTC offset for the birthplace are needed for accurate house placements. No real name is collected — nickname is used only so you can reload your saved chart.</div>
+
+        <div class="astro-form" style="margin-top:4px">
+          <div style="grid-column: 1 / -1; position:relative">
+            <label>Birth Location</label>
+            <div style="display:flex; gap:8px">
+              <input type="text" id="astro-location-search" placeholder="Search a city, e.g. New York" />
+              <button class="btn btn-ghost" type="button" onclick="searchAstroLocation()">Search</button>
+            </div>
+            <div id="astro-location-results" class="astro-location-results"></div>
+          </div>
+        </div>
+
+        <div class="astro-form">
+          <div>
+            <label>Latitude</label>
+            <input type="number" id="astro-lat" placeholder="40.7128" step="0.0001" />
+          </div>
+          <div>
+            <label>Longitude</label>
+            <input type="number" id="astro-lon" placeholder="-74.0060" step="0.0001" />
+          </div>
+          <div>
+            <label>Timezone (IANA)</label>
+            <input type="text" id="astro-tz" placeholder="America/New_York" />
+          </div>
+          <div>
+            <label>Location Label (optional)</label>
+            <input type="text" id="astro-location" placeholder="New York, NY" maxlength="60" />
+          </div>
+        </div>
+
+        <div class="astro-hint">Search fills in latitude/longitude/timezone automatically — needed for accurate house placements. You can still edit them by hand if the search doesn't have your birthplace. No real name is collected — nickname is used only so you can reload your saved chart.</div>
         <div class="astro-actions" style="margin-top:16px">
           <button class="btn" onclick="calculateAstrology()">Calculate Chart</button>
           <div class="astro-saved">
             <input type="text" id="astro-load-nickname" placeholder="nickname to load" />
             <button class="btn btn-ghost" onclick="loadSavedAstrology()">Load Saved</button>
+            <button class="btn btn-ghost" onclick="loadAstrologyTransits()">Current Transits</button>
           </div>
         </div>
       </div>
@@ -848,9 +908,130 @@
     }
 
     // ── Astrology ──
+    async function searchAstroLocation() {
+      const query = document.getElementById("astro-location-search").value.trim();
+      const resultsEl = document.getElementById("astro-location-results");
+      if (!query) { resultsEl.innerHTML = ""; return; }
+
+      resultsEl.innerHTML = `<div class="astro-location-option" style="cursor:default">Searching…</div>`;
+
+      const res = await fetch(`/api/astrology/geocode?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+
+      if (data.error || !data.results || data.results.length === 0) {
+        resultsEl.innerHTML = `<div class="astro-location-option" style="cursor:default;color:var(--muted)">No matches found — enter lat/long/timezone manually.</div>`;
+        return;
+      }
+
+      resultsEl.innerHTML = data.results.map((r, i) => `
+        <button type="button" class="astro-location-option" onclick="pickAstroLocation(${i})">${r.label} — ${r.timezone}</button>
+      `).join("");
+      window._astroLocationResults = data.results;
+    }
+
+    function pickAstroLocation(i) {
+      const r = window._astroLocationResults[i];
+      document.getElementById("astro-lat").value = r.latitude;
+      document.getElementById("astro-lon").value = r.longitude;
+      document.getElementById("astro-tz").value = r.timezone;
+      document.getElementById("astro-location").value = r.label;
+      document.getElementById("astro-location-results").innerHTML = "";
+      document.getElementById("astro-location-search").value = r.label;
+    }
+
     function toggleEmailField() {
       const inDepth = document.getElementById("astro-type").value === "in_depth";
       document.getElementById("astro-email-wrap").style.display = inDepth ? "block" : "none";
+    }
+
+    // ── Chart Wheel ──
+    const ZODIAC_GLYPHS = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
+    const PLANET_GLYPHS = {
+      Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
+      Jupiter: "♃", Saturn: "♄", Uranus: "♅", Neptune: "♆", Pluto: "♇", "North Node": "☊",
+    };
+    const ASPECT_STYLE = {
+      Conjunction: { color: "#6b7280", dash: "" },
+      Sextile:     { color: "#4fef9a", dash: "" },
+      Square:      { color: "#ef4f6b", dash: "" },
+      Trine:       { color: "#4f8ef7", dash: "" },
+      Opposition:  { color: "#ef4f6b", dash: "4,3" },
+    };
+
+    function bearingFor(longitude, ascLongitude) {
+      return ((270 - (longitude - ascLongitude)) % 360 + 360) % 360;
+    }
+
+    function polarXY(cx, cy, r, bearingDeg) {
+      const rad = bearingDeg * Math.PI / 180;
+      return { x: cx + r * Math.sin(rad), y: cy - r * Math.cos(rad) };
+    }
+
+    function chartWheelSVG(data) {
+      const cx = 200, cy = 200;
+      const zodiacOuter = 190, zodiacInner = 164;
+      const houseOuter = zodiacInner, houseInner = 60;
+      const asc = data.houses.ascendant.longitude;
+      const cusps = data.houses.cusps;
+
+      let svg = `<svg viewBox="0 0 400 400" style="width:100%;max-width:440px;display:block;margin:0 auto">`;
+
+      // outer + inner frame circles
+      svg += `<circle cx="${cx}" cy="${cy}" r="${zodiacOuter}" fill="none" stroke="#1e2330" stroke-width="1.5"/>`;
+      svg += `<circle cx="${cx}" cy="${cy}" r="${zodiacInner}" fill="none" stroke="#1e2330" stroke-width="1"/>`;
+      svg += `<circle cx="${cx}" cy="${cy}" r="${houseInner}" fill="none" stroke="#1e2330" stroke-width="1"/>`;
+
+      // zodiac ring: 12 dividers + glyphs
+      for (let i = 0; i < 12; i++) {
+        const b = bearingFor(i * 30, asc);
+        const p1 = polarXY(cx, cy, zodiacInner, b);
+        const p2 = polarXY(cx, cy, zodiacOuter, b);
+        svg += `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="#1e2330" stroke-width="1"/>`;
+        const mid = polarXY(cx, cy, (zodiacOuter + zodiacInner) / 2, bearingFor(i * 30 + 15, asc));
+        svg += `<text x="${mid.x.toFixed(1)}" y="${mid.y.toFixed(1)}" fill="#6b7280" font-size="13" text-anchor="middle" dominant-baseline="middle">${ZODIAC_GLYPHS[i]}</text>`;
+      }
+
+      // house cusp lines + numbers
+      for (let i = 0; i < 12; i++) {
+        const b = bearingFor(cusps[i].longitude, asc);
+        const isAngle = (i === 0 || i === 3 || i === 6 || i === 9);
+        const p1 = polarXY(cx, cy, houseInner, b);
+        const p2 = polarXY(cx, cy, houseOuter, b);
+        svg += `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${isAngle ? "#4f8ef7" : "#1e2330"}" stroke-width="${isAngle ? 1.5 : 1}"/>`;
+
+        const nextLon = cusps[(i + 1) % 12].longitude;
+        const span = ((nextLon - cusps[i].longitude) % 360 + 360) % 360;
+        const midLon = cusps[i].longitude + span / 2;
+        const labelPos = polarXY(cx, cy, houseOuter - 12, bearingFor(midLon, asc));
+        svg += `<text x="${labelPos.x.toFixed(1)}" y="${labelPos.y.toFixed(1)}" fill="#6b7280" font-size="9" font-family="DM Mono, monospace" text-anchor="middle" dominant-baseline="middle">${i + 1}</text>`;
+      }
+
+      // aspect lines (drawn inside the house-inner circle)
+      const planetLon = {};
+      Object.entries(data.planets).forEach(([name, p]) => { planetLon[name] = p.longitude; });
+      data.aspects.forEach(a => {
+        const style = ASPECT_STYLE[a.aspect] || ASPECT_STYLE.Conjunction;
+        const p1 = polarXY(cx, cy, houseInner, bearingFor(planetLon[a.planet_a], asc));
+        const p2 = polarXY(cx, cy, houseInner, bearingFor(planetLon[a.planet_b], asc));
+        svg += `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${style.color}" stroke-width="1" stroke-dasharray="${style.dash}" opacity="0.7"/>`;
+      });
+
+      // planets, staggered radius to reduce overlap when close together
+      const order = Object.entries(data.planets).sort((a, b) => a[1].longitude - b[1].longitude);
+      let lastLon = null, radius = 128;
+      order.forEach(([name, p]) => {
+        if (lastLon !== null) {
+          const gap = ((p.longitude - lastLon) % 360 + 360) % 360;
+          radius = gap < 8 ? (radius === 128 ? 146 : 128) : 128;
+        }
+        lastLon = p.longitude;
+        const pos = polarXY(cx, cy, radius, bearingFor(p.longitude, asc));
+        svg += `<circle cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="9" fill="#13161f" stroke="#1e2330"/>`;
+        svg += `<text x="${pos.x.toFixed(1)}" y="${pos.y.toFixed(1)}" fill="#f7974f" font-size="12" text-anchor="middle" dominant-baseline="middle">${PLANET_GLYPHS[name] || name[0]}</text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
     }
 
     function signCardsHTML(data) {
@@ -902,9 +1083,17 @@
           <td>${a.planet_b}</td>
           <td style="font-family:var(--font-mono)">${a.orb}° orb</td>
         </tr>
+        <tr><td colspan="4" class="astro-reading">${a.interpretation}</td></tr>
       `).join("") || `<tr><td colspan="4" style="color:var(--muted)">No major aspects within orb.</td></tr>`;
 
+      const readingRows = Object.entries(data.planets).map(([name, p]) => `
+        <div class="astro-reading-item"><strong>${name} in ${p.sign}</strong> — ${p.interpretation}</div>
+      `).join("");
+
       return `
+        <div class="astro-section-title">Chart Wheel</div>
+        <div class="card">${chartWheelSVG(data)}</div>
+
         <div class="astro-section-title">Planets</div>
         <div class="card" style="padding:0 24px">
           <table class="astro-table">
@@ -927,6 +1116,8 @@
               <div class="degree">${data.houses.midheaven.degree}°</div>
             </div>
           </div>
+          <div class="astro-reading-item" style="margin-top:16px">${data.houses.ascendant.interpretation}</div>
+          <div class="astro-reading-item">${data.houses.midheaven.interpretation}</div>
         </div>
 
         <div class="astro-section-title">Houses</div>
@@ -944,6 +1135,9 @@
             <tbody>${aspectRows}</tbody>
           </table>
         </div>
+
+        <div class="astro-section-title">Readings</div>
+        <div class="card">${readingRows}</div>
       `;
     }
 
@@ -960,7 +1154,7 @@
         birth_time: document.getElementById("astro-time").value,
         latitude: document.getElementById("astro-lat").value,
         longitude: document.getElementById("astro-lon").value,
-        utc_offset: document.getElementById("astro-utc").value,
+        timezone: document.getElementById("astro-tz").value,
         location_label: document.getElementById("astro-location").value,
         chart_type: chartType,
         email: document.getElementById("astro-email").value,
@@ -989,6 +1183,58 @@
 
       if (data.error) { setContent("astro-content", errorHTML(data.error)); return; }
       renderAstrology(data);
+    }
+
+    function transitsHTML(data) {
+      const rows = Object.entries(data.transiting_planets).map(([name, p]) => `
+        <tr>
+          <td>${name}</td>
+          <td>${p.sign}${p.retrograde ? '<span class="retro-tag">R</span>' : ""}</td>
+          <td style="font-family:var(--font-mono)">${p.degree}°</td>
+          <td>Natal House ${p.house}</td>
+        </tr>
+      `).join("");
+
+      const aspectRows = data.aspects_to_natal.map(a => `
+        <tr>
+          <td>Transiting ${a.planet_a}</td>
+          <td>${a.aspect}</td>
+          <td>Natal ${a.planet_b}</td>
+          <td style="font-family:var(--font-mono)">${a.orb}° orb</td>
+        </tr>
+        <tr><td colspan="4" class="astro-reading">${a.interpretation}</td></tr>
+      `).join("") || `<tr><td colspan="4" style="color:var(--muted)">No major transiting aspects within orb.</td></tr>`;
+
+      return `
+        <div class="astro-section-title">Current Transits</div>
+        <div class="astro-hint" style="margin-bottom:12px">As of ${new Date(data.as_of).toLocaleString()} · natal chart for ${data.nickname}</div>
+        <div class="card" style="padding:0 24px">
+          <table class="astro-table">
+            <thead><tr><th>Planet</th><th>Sign</th><th>Degree</th><th>Falls In</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+
+        <div class="astro-section-title">Transiting Aspects to Natal Chart</div>
+        <div class="card" style="padding:0 24px">
+          <table class="astro-table">
+            <thead><tr><th>Transiting</th><th>Aspect</th><th>Natal</th><th>Orb</th></tr></thead>
+            <tbody>${aspectRows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    async function loadAstrologyTransits() {
+      const nickname = document.getElementById("astro-load-nickname").value.trim();
+      if (!nickname) return;
+      setContent("astro-content", `<div class="loading"><div class="spinner"></div> Reading today's sky…</div>`);
+
+      const res = await fetch(`/api/astrology/transits/${encodeURIComponent(nickname)}`);
+      const data = await res.json();
+
+      if (data.error) { setContent("astro-content", errorHTML(data.error)); return; }
+      setContent("astro-content", transitsHTML(data));
     }
 
     // ── Init: set today's date and load APOD ──
