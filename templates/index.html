@@ -644,7 +644,7 @@
       <div class="card">
         <div class="astro-form">
           <div>
-            <label>Nickname (not your real name)</label>
+            <label>Nickname (optional, not your real name)</label>
             <input type="text" id="astro-nickname" placeholder="e.g. Stardust99" maxlength="32" />
           </div>
           <div>
@@ -657,13 +657,13 @@
           </div>
           <div>
             <label>Chart Type</label>
-            <select id="astro-type" onchange="toggleEmailField()">
+            <select id="astro-type">
               <option value="basic">Basic (Sun / Moon / Rising)</option>
               <option value="in_depth">In-Depth (full chart)</option>
             </select>
           </div>
-          <div id="astro-email-wrap" style="display:none">
-            <label>Email (required for in-depth)</label>
+          <div>
+            <label>Email (optional)</label>
             <input type="email" id="astro-email" placeholder="you@example.com" />
           </div>
         </div>
@@ -937,11 +937,6 @@
       document.getElementById("astro-location").value = r.label;
       document.getElementById("astro-location-results").innerHTML = "";
       document.getElementById("astro-location-search").value = r.label;
-    }
-
-    function toggleEmailField() {
-      const inDepth = document.getElementById("astro-type").value === "in_depth";
-      document.getElementById("astro-email-wrap").style.display = inDepth ? "block" : "none";
     }
 
     // ── Chart Wheel ──
