@@ -105,6 +105,9 @@ def astrology_calculate():
     if missing:
         return jsonify({"error": f"Missing required field(s): {', '.join(missing)}"}), 400
 
+    if chart_type == "in_depth" and not data.get("email"):
+        return jsonify({"error": "An email is required for an in-depth chart."}), 400
+
     try:
         latitude = float(data["latitude"])
         longitude = float(data["longitude"])
@@ -127,7 +130,7 @@ def astrology_calculate():
                 "timezone": tz_name,
                 "location_label": data.get("location_label", ""),
                 "chart_type": chart_type,
-                "email": data.get("email", ""),
+                "email": data.get("email", "") if chart_type == "in_depth" else "",
             })
         except astrology_storage.InvalidNickname as e:
             return jsonify({"error": str(e)}), 400
