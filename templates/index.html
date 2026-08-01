@@ -422,6 +422,109 @@
       font-family: var(--font-mono);
       color: var(--muted);
     }
+
+    /* ── Astrology ── */
+    .astro-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .astro-form label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .astro-form input, .astro-form select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      outline: none;
+    }
+
+    .astro-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .astro-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .astro-saved {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .astro-saved input { width: 140px; }
+
+    .btn-ghost {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .sign-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .sign-card { text-align: center; }
+    .sign-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .sign-card .value { font-size: 22px; font-weight: 600; margin: 6px 0 2px; color: var(--accent2); }
+    .sign-card .degree { font-size: 12px; font-family: var(--font-mono); color: var(--muted); }
+
+    .astro-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .astro-table th {
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 0 12px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .astro-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .astro-table tr:last-child td { border-bottom: none; }
+
+    .retro-tag {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--danger);
+      margin-left: 6px;
+    }
+
+    .astro-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 24px 0 12px;
+    }
+
+    .astro-section-title:first-child { margin-top: 0; }
   </style>
 </head>
 <body>
@@ -437,6 +540,7 @@
     <button onclick="switchPanel('mars', this)">🔴 Mars Rover</button>
     <button onclick="switchPanel('neo', this)">☄️ Near Earth Objects</button>
     <button onclick="switchPanel('iss', this)">🛰 ISS Location</button>
+    <button onclick="switchPanel('astro', this)">🔮 Astrology</button>
   </nav>
 
   <main>
@@ -484,6 +588,68 @@
         <span class="subtitle">Open Notify API · updates every 5s</span>
       </div>
       <div id="iss-content"><div class="loading"><div class="spinner"></div> Locating the station…</div></div>
+    </div>
+
+    <!-- Astrology -->
+    <div id="panel-astro" class="panel">
+      <div class="panel-header">
+        <h2>Natal Chart</h2>
+        <span class="subtitle">Swiss Ephemeris (Moshier) · calculated locally</span>
+      </div>
+
+      <div class="card">
+        <div class="astro-form">
+          <div>
+            <label>Nickname (not your real name)</label>
+            <input type="text" id="astro-nickname" placeholder="e.g. Stardust99" maxlength="32" />
+          </div>
+          <div>
+            <label>Birth Date</label>
+            <input type="date" id="astro-date" />
+          </div>
+          <div>
+            <label>Birth Time</label>
+            <input type="time" id="astro-time" />
+          </div>
+          <div>
+            <label>Latitude</label>
+            <input type="number" id="astro-lat" placeholder="40.7128" step="0.0001" />
+          </div>
+          <div>
+            <label>Longitude</label>
+            <input type="number" id="astro-lon" placeholder="-74.0060" step="0.0001" />
+          </div>
+          <div>
+            <label>UTC Offset (birthplace)</label>
+            <input type="number" id="astro-utc" placeholder="-4" step="0.5" />
+          </div>
+          <div>
+            <label>Location Label (optional)</label>
+            <input type="text" id="astro-location" placeholder="New York, NY" maxlength="60" />
+          </div>
+          <div>
+            <label>Chart Type</label>
+            <select id="astro-type" onchange="toggleEmailField()">
+              <option value="basic">Basic (Sun / Moon / Rising)</option>
+              <option value="in_depth">In-Depth (full chart)</option>
+            </select>
+          </div>
+          <div id="astro-email-wrap" style="display:none">
+            <label>Email (required for in-depth)</label>
+            <input type="email" id="astro-email" placeholder="you@example.com" />
+          </div>
+        </div>
+        <div class="astro-hint">Lat/long + UTC offset for the birthplace are needed for accurate house placements. No real name is collected — nickname is used only so you can reload your saved chart.</div>
+        <div class="astro-actions" style="margin-top:16px">
+          <button class="btn" onclick="calculateAstrology()">Calculate Chart</button>
+          <div class="astro-saved">
+            <input type="text" id="astro-load-nickname" placeholder="nickname to load" />
+            <button class="btn btn-ghost" onclick="loadSavedAstrology()">Load Saved</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="astro-content"></div>
     </div>
 
   </main>
@@ -679,6 +845,150 @@
       `);
 
       issFirstLoad = false;
+    }
+
+    // ── Astrology ──
+    function toggleEmailField() {
+      const inDepth = document.getElementById("astro-type").value === "in_depth";
+      document.getElementById("astro-email-wrap").style.display = inDepth ? "block" : "none";
+    }
+
+    function signCardsHTML(data) {
+      return `
+        <div class="card">
+          <div class="sign-grid">
+            <div class="sign-card">
+              <div class="label">Sun</div>
+              <div class="value">${data.sun.sign}</div>
+              <div class="degree">${data.sun.degree}°</div>
+            </div>
+            <div class="sign-card">
+              <div class="label">Moon</div>
+              <div class="value">${data.moon.sign}</div>
+              <div class="degree">${data.moon.degree}°</div>
+            </div>
+            <div class="sign-card">
+              <div class="label">Rising</div>
+              <div class="value">${data.rising.sign}</div>
+              <div class="degree">${data.rising.degree}°</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function inDepthHTML(data) {
+      const planetRows = Object.entries(data.planets).map(([name, p]) => `
+        <tr>
+          <td>${name}</td>
+          <td>${p.sign}${p.retrograde ? '<span class="retro-tag">R</span>' : ""}</td>
+          <td style="font-family:var(--font-mono)">${p.degree}°</td>
+          <td>House ${p.house}</td>
+        </tr>
+      `).join("");
+
+      const houseRows = data.houses.cusps.map((h, i) => `
+        <tr>
+          <td>House ${i + 1}</td>
+          <td>${h.sign}</td>
+          <td style="font-family:var(--font-mono)">${h.degree}°</td>
+        </tr>
+      `).join("");
+
+      const aspectRows = data.aspects.map(a => `
+        <tr>
+          <td>${a.planet_a}</td>
+          <td>${a.aspect}</td>
+          <td>${a.planet_b}</td>
+          <td style="font-family:var(--font-mono)">${a.orb}° orb</td>
+        </tr>
+      `).join("") || `<tr><td colspan="4" style="color:var(--muted)">No major aspects within orb.</td></tr>`;
+
+      return `
+        <div class="astro-section-title">Planets</div>
+        <div class="card" style="padding:0 24px">
+          <table class="astro-table">
+            <thead><tr><th>Planet</th><th>Sign</th><th>Degree</th><th>House</th></tr></thead>
+            <tbody>${planetRows}</tbody>
+          </table>
+        </div>
+
+        <div class="astro-section-title">Angles</div>
+        <div class="card">
+          <div class="sign-grid">
+            <div class="sign-card">
+              <div class="label">Ascendant</div>
+              <div class="value">${data.houses.ascendant.sign}</div>
+              <div class="degree">${data.houses.ascendant.degree}°</div>
+            </div>
+            <div class="sign-card">
+              <div class="label">Midheaven</div>
+              <div class="value">${data.houses.midheaven.sign}</div>
+              <div class="degree">${data.houses.midheaven.degree}°</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="astro-section-title">Houses</div>
+        <div class="card" style="padding:0 24px">
+          <table class="astro-table">
+            <thead><tr><th>House</th><th>Sign</th><th>Cusp Degree</th></tr></thead>
+            <tbody>${houseRows}</tbody>
+          </table>
+        </div>
+
+        <div class="astro-section-title">Aspects</div>
+        <div class="card" style="padding:0 24px">
+          <table class="astro-table">
+            <thead><tr><th>Planet</th><th>Aspect</th><th>Planet</th><th>Orb</th></tr></thead>
+            <tbody>${aspectRows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderAstrology(data) {
+      const html = data.chart_type === "in_depth" ? inDepthHTML(data) : signCardsHTML(data);
+      setContent("astro-content", html);
+    }
+
+    async function calculateAstrology() {
+      const chartType = document.getElementById("astro-type").value;
+      const payload = {
+        nickname: document.getElementById("astro-nickname").value.trim(),
+        birth_date: document.getElementById("astro-date").value,
+        birth_time: document.getElementById("astro-time").value,
+        latitude: document.getElementById("astro-lat").value,
+        longitude: document.getElementById("astro-lon").value,
+        utc_offset: document.getElementById("astro-utc").value,
+        location_label: document.getElementById("astro-location").value,
+        chart_type: chartType,
+        email: document.getElementById("astro-email").value,
+      };
+
+      setContent("astro-content", `<div class="loading"><div class="spinner"></div> Charting the sky…</div>`);
+
+      const res = await fetch("/api/astrology/chart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.error) { setContent("astro-content", errorHTML(data.error)); return; }
+      renderAstrology(data);
+    }
+
+    async function loadSavedAstrology() {
+      const nickname = document.getElementById("astro-load-nickname").value.trim();
+      if (!nickname) return;
+      setContent("astro-content", `<div class="loading"><div class="spinner"></div> Loading saved chart…</div>`);
+
+      const res = await fetch(`/api/astrology/saved/${encodeURIComponent(nickname)}`);
+      const data = await res.json();
+
+      if (data.error) { setContent("astro-content", errorHTML(data.error)); return; }
+      renderAstrology(data);
     }
 
     // ── Init: set today's date and load APOD ──

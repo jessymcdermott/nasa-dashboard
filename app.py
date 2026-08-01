@@ -4,6 +4,9 @@ from flask import Flask, render_template, jsonify, request
 from dotenv import load_dotenv
 from datetime import datetime, date
 
+from src.astrology import chart as astrology_chart
+from src.astrology import storage as astrology_storage
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -89,6 +92,75 @@ def iss():
         return jsonify({**data, "crew": crew.get("people", [])})
     except requests.RequestException as e:
         return jsonify({"error": str(e)}), 502
+
+
+# Astrology – natal chart calculation + optional save-for-later
+@app.route("/api/astrology/chart", methods=["POST"])
+def astrology_calculate():
+    data = request.get_json(silent=True) or {}
+
+    chart_type = "in_depth" if data.get("chart_type") == "in_depth" else "basic"
+    required = ["birth_date", "birth_time", "latitude", "longitude", "utc_offset"]
+    missing = [f for f in required if data.get(f) in (None, "")]
+    if missing:
+        return jsonify({"error": f"Missing required field(s): {', '.join(missing)}"}), 400
+
+    if chart_type == "in_depth" and not data.get("email"):
+        return jsonify({"error": "An email is required for an in-depth chart."}), 400
+
+    try:
+        latitude = float(data["latitude"])
+        longitude = float(data["longitude"])
+        utc_offset = float(data["utc_offset"])
+        result = astrology_chart.calculate_chart(
+            data["birth_date"], data["birth_time"], latitude, longitude, utc_offset, chart_type
+        )
+    except (ValueError, KeyError) as e:
+        return jsonify({"error": f"Invalid input: {e}"}), 400
+
+    nickname = data.get("nickname")
+    if nickname:
+        try:
+            astrology_storage.save_record({
+                "nickname": nickname,
+                "birth_date": data["birth_date"],
+                "birth_time": data["birth_time"],
+                "latitude": latitude,
+                "longitude": longitude,
+                "utc_offset": utc_offset,
+                "location_label": data.get("location_label", ""),
+                "chart_type": chart_type,
+                "email": data.get("email", "") if chart_type == "in_depth" else "",
+            })
+        except astrology_storage.InvalidNickname as e:
+            return jsonify({"error": str(e)}), 400
+
+    return jsonify(result)
+
+
+# Astrology – load a previously saved nickname's chart
+@app.route("/api/astrology/saved/<nickname>")
+def astrology_saved(nickname):
+    try:
+        record = astrology_storage.load_record(nickname)
+    except astrology_storage.InvalidNickname as e:
+        return jsonify({"error": str(e)}), 400
+
+    if not record:
+        return jsonify({"error": "No saved chart for that nickname."}), 404
+
+    try:
+        result = astrology_chart.calculate_chart(
+            record["birth_date"], record["birth_time"],
+            float(record["latitude"]), float(record["longitude"]), float(record["utc_offset"]),
+            record.get("chart_type", "basic"),
+        )
+    except (ValueError, KeyError) as e:
+        return jsonify({"error": f"Saved record is corrupt: {e}"}), 500
+
+    result["nickname"] = record["nickname"]
+    result["location_label"] = record.get("location_label", "")
+    return jsonify(result)
 
 
 if __name__ == "__main__":

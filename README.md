@@ -11,6 +11,8 @@ A Flask web app pulling live data from 4 NASA APIs — built as a Black Duck Cod
 | Near Earth Objects | NASA NeoWs | `api.nasa.gov/neo/rest/v1/feed` |
 | ISS Location | Open Notify | `api.open-notify.org/iss-now.json` |
 
+Plus an **Astrology** panel: full natal chart (planets, houses, ascendant/midheaven, aspects) calculated locally via the Swiss Ephemeris (`pyswisseph`, Moshier mode — no external API or data files needed). Users can optionally save a chart under a nickname (no real names collected) to `data/astrology/<nickname>.txt` so they can reload it later; email is only collected/stored for in-depth charts. That directory is gitignored — it's runtime user data, not part of the repo.
+
 ## Setup
 
 **1. Clone / open in VS Code**
