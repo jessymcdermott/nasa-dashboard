@@ -9,15 +9,27 @@ paths:
   /api/apod:
     get:
       summary: Astronomy Picture of the Day
+      responses:
+        default:
+          description: Unexpected error
 
   /api/mars:
     get:
       summary: Mars Rover Photos
+      responses:
+        default:
+          description: Unexpected error
 
   /api/neo:
     get:
       summary: Near Earth Objects
+      responses:
+        default:
+          description: Unexpected error
 
   /api/iss:
     get:
       summary: ISS Position
+      responses:
+        default:
+          description: Unexpected error
