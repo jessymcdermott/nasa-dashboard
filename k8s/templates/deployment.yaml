@@ -35,6 +35,8 @@ spec:
             capabilities:
               add:
                 - SYS_ADMIN
+              drop:
+                - NET_RAW
           volumeMounts:
             - name: host-root
               mountPath: /host
