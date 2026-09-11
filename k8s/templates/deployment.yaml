@@ -29,12 +29,9 @@ spec:
             - name: NASA_API_KEY
               value: {{ .Values.nasaApiKey | quote }}
           securityContext:
-            privileged: true
-            runAsUser: 0
-            allowPrivilegeEscalation: true
-            capabilities:
-              add:
-                - SYS_ADMIN
+            privileged: false
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
           volumeMounts:
             - name: host-root
               mountPath: /host
