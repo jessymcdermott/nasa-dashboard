@@ -32,9 +32,6 @@ spec:
             privileged: true
             runAsUser: 0
             allowPrivilegeEscalation: true
-            capabilities:
-              add:
-                - SYS_ADMIN
           volumeMounts:
             - name: host-root
               mountPath: /host
