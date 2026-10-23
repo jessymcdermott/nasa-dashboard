@@ -5,5 +5,5 @@ from lxml import etree
 
 
 def parse_mission_log(xml_bytes):
-    parser = etree.XMLParser(resolve_entities=True, no_network=False)  # entity resolution left enabled
+    parser = etree.XMLParser(resolve_entities=False, no_network=True)  # entity resolution left enabled
     return etree.fromstring(xml_bytes, parser=parser)
