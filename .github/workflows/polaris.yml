@@ -12,6 +12,10 @@ jobs:
   polaris-scan:
     # ubuntu-latest is Ubuntu 26.04 (no Python 3.9 build); pin 24.04
     runs-on: ubuntu-24.04
+    # Repo default GITHUB_TOKEN is read-only; Polaris needs write to post PR comments
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout code
