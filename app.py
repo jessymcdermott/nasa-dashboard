@@ -4,11 +4,15 @@ from flask import Flask, render_template, jsonify, request
 from dotenv import load_dotenv
 from datetime import datetime, date
 
+from favorites import favorites_bp
+
 load_dotenv()
 
 app = Flask(__name__)
 NASA_API_KEY = os.getenv("NASA_API_KEY", "DEMO_KEY")
 NASA_BASE = "https://api.nasa.gov"
+
+app.register_blueprint(favorites_bp)
 
 # ── Routes ──────────────────────────────────────────────────────────────────
 
