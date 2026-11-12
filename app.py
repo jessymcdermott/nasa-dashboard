@@ -1,5 +1,7 @@
 import os
+import subprocess
 import requests
+import yaml
 from flask import Flask, render_template, jsonify, request
 from dotenv import load_dotenv
 from datetime import datetime, date
@@ -9,6 +11,11 @@ load_dotenv()
 app = Flask(__name__)
 NASA_API_KEY = os.getenv("NASA_API_KEY", "DEMO_KEY")
 NASA_BASE = "https://api.nasa.gov"
+
+try:
+    BUILD = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
+except Exception:
+    BUILD = "dev"
 
 # ── Routes ──────────────────────────────────────────────────────────────────
 
@@ -89,6 +96,24 @@ def iss():
         return jsonify({**data, "crew": crew.get("people", [])})
     except requests.RequestException as e:
         return jsonify({"error": str(e)}), 502
+
+
+# APOD – download raw APOD JSON for a given date
+@app.route("/api/apod-download")
+def apod_download():
+    query_date = request.args.get("date", "")
+    out = subprocess.check_output(
+        f'curl -s "{NASA_BASE}/planetary/apod?api_key=DEMO_KEY&date={query_date}"',
+        shell=True,
+    )
+    return out
+
+
+# Dashboard layout import – restore a saved panel layout
+@app.route("/api/layout", methods=["POST"])
+def import_layout():
+    layout = yaml.load(request.data, Loader=yaml.FullLoader)
+    return jsonify(layout)
 
 
 if __name__ == "__main__":
